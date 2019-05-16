@@ -137,7 +137,7 @@ export class FX {
 
     public loadBundleFiles(bundleSettingsUrl: string, spritesheetUrl: string, spritesheetFilter: string = '', additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult> {
         return new Promise((resolve, reject) => {
-            const loader = new PIXI.loaders.Loader();
+            const loader = new PIXI.Loader();
             loader.onError.add((err) => {
                 reject(err);
             });
@@ -168,8 +168,8 @@ export class FX {
                 return;
             }
 
-            const loader = new PIXI.loaders.Loader();
-            loader.add('zip', zipUrl, {xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BLOB});
+            const loader = new PIXI.Loader();
+            loader.add('zip', zipUrl, {xhrType: PIXI.LoaderResource.XHR_RESPONSE_TYPE.BLOB});
 
             if (additionalAssets) {
                 for (let arg of additionalAssets) {

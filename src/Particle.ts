@@ -98,7 +98,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
     private _color: Color;
     private _dt: number;
 
-    private _spawnOnBounce: Boolean;
+    private _spawnOnBounce: boolean;
 
     private _childEmitters: ParticleEmitter[] = [];
     private _hasChildEmitters: boolean = false;
@@ -293,7 +293,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
         }
 
         const component = this.component;
-        const transform = <PIXI.Transform>component.transform;
+        const transform = component.transform as PIXI.Transform;
         const mod = t * dt;
 
         //Motion
