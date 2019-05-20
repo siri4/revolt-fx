@@ -1,6 +1,6 @@
-/// <reference types="pixi.js" />
-import { IEffectSequenceSettings } from "./FX";
+import { Container } from "pixi.js";
 import { BaseEffect } from "./BaseEffect";
+import { IEffectSequenceSettings } from "./FX";
 import { FXSignal } from "./util/FXSignal";
 export interface IEffectSequenceSignals {
     started: FXSignal;
@@ -21,7 +21,7 @@ export declare class EffectSequence extends BaseEffect {
     private _elements;
     __on: IEffectSequenceSignals;
     constructor(componentId: string);
-    init(container: PIXI.Container, delay?: number, autoStart?: boolean, scaleMod?: number): EffectSequence;
+    init(container: Container, delay?: number, autoStart?: boolean, scaleMod?: number): EffectSequence;
     start(): EffectSequence;
     update(dt: number): void;
     stop(): void;

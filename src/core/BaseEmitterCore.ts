@@ -1,6 +1,6 @@
-import {Particle} from "../Particle";
-import {IBoxCoreParams, ICircleCoreParams, IRingCoreParams} from "../FX";
-import {ParticleEmitter} from "../ParticleEmitter";
+import { IBoxCoreParams, ICircleCoreParams, IRingCoreParams } from "../FX";
+import { Particle } from "../Particle";
+import { ParticleEmitter } from "../ParticleEmitter";
 
 export class BaseEmitterCore {
 
@@ -19,10 +19,9 @@ export class BaseEmitterCore {
     public __y: number;
     public __scaleMod: number;
 
-    public static __TYPE_BOX: string = 'box';
-    public static __TYPE_CIRCLE: string = 'circle';
-    public static __TYPE_RING: string = 'ring';
-
+    public static __TYPE_BOX: string = "box";
+    public static __TYPE_CIRCLE: string = "circle";
+    public static __TYPE_RING: string = "ring";
 
     constructor(public type: string) {
 

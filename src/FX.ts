@@ -1,35 +1,36 @@
-/// <reference types="pixi.js" />
-/// <reference types="jszip" />
+// <reference types="pixi.js" />
+// <reference types="jszip" />
 
-import {ParticleEmitter} from "./ParticleEmitter";
-import {LinkedList} from "./util/LinkedList";
-import {RingEmitterCore} from "./core/RingEmitterCore";
-import {CircleEmitterCore} from "./core/CircleEmitterCore";
-import {BoxEmitterCore} from "./core/BoxEmitterCore";
-import {BaseEffect} from "./BaseEffect";
-import {EffectSequence} from "./EffectSequence";
-import {Sprite} from "./Sprite";
-import {Particle} from "./Particle";
-import {BaseEmitterCore} from "./core/BaseEmitterCore";
-import {MovieClip} from "./MovieClip";
-import {Sanitizer} from "./Sanitizer";
+import { Container, Loader, LoaderResource, Spritesheet, Texture, utils } from "pixi.js";
+import { BaseEffect } from "./BaseEffect";
+import { BaseEmitterCore } from "./core/BaseEmitterCore";
+import { BoxEmitterCore } from "./core/BoxEmitterCore";
+import { CircleEmitterCore } from "./core/CircleEmitterCore";
+import { RingEmitterCore } from "./core/RingEmitterCore";
+import { EffectSequence } from "./EffectSequence";
+import { MovieClip } from "./MovieClip";
+import { Particle } from "./Particle";
+import { ParticleEmitter } from "./ParticleEmitter";
+import { Sanitizer } from "./Sanitizer";
+import { Sprite } from "./Sprite";
+import { LinkedList } from "./util/LinkedList";
 
 enum ComponentType {
     Sprite,
-    MovieClip
+    MovieClip,
 }
 
 enum EffectSequenceComponentType {
     Sprite,
     MovieClip,
     Emitter,
-    Trigger
+    Trigger,
 }
 
 export class FX {
 
     public static settingsVersion: number = 0;
-    private static _bundleHash: string = '80c6df7fb0d3d898f34ce0031c037fef';
+    private static _bundleHash: string = "80c6df7fb0d3d898f34ce0031c037fef";
 
     public useBlendModes: boolean = true;
     public particleCount: number = 0;
@@ -37,7 +38,6 @@ export class FX {
     public effectSequenceCount: number = 0;
     public maxParticles: number = 5000;
     public particleFac: number = 1;
-    public fix
 
     private _active: boolean = false;
     private _timeElapsed: number;
@@ -48,15 +48,14 @@ export class FX {
 
     private _effects: LinkedList = new LinkedList();
 
-    public __containers: { [key: string]: PIXI.Container } = {};
+    public __containers: { [key: string]: Container } = {};
 
-    public static ComponentType: any = ComponentType;
     public static EffectSequenceComponentType: any = EffectSequenceComponentType;
 
     public static __emitterCores: any = {
         circle: CircleEmitterCore,
         box: BoxEmitterCore,
-        ring: RingEmitterCore
+        ring: RingEmitterCore,
     };
 
     constructor() {
@@ -78,18 +77,18 @@ export class FX {
     }
 
     public update(delta?: number) {
-        if (!this.active) return;
+        if (!this.active) { return; }
 
         const t = Date.now();
         let dt = (t - this._timeElapsed) * 0.001;
 
-        if (delta !== undefined) dt *= delta;
+        if (delta !== undefined) { dt *= delta; }
 
         const list = this._effects;
-        let node = <BaseEffect>list.first;
+        let node = list.first as BaseEffect;
         let next;
         while (node) {
-            next = <BaseEffect>node.next;
+            next = node.next as BaseEffect;
             node.update(dt);
             node = next;
         }
@@ -103,54 +102,54 @@ export class FX {
             sprites: [],
             effectSequences: [],
             emitters: [],
-            cores: {}
+            cores: {},
         };
         this._settingsCache = {
             mcs: {},
             sprites: {},
             emitters: {},
-            effectSequences: {}
+            effectSequences: {},
         };
         this._nameMaps = {
             emitters: {},
-            effectSequences: {}
+            effectSequences: {},
         };
     }
 
     public setFloorY(value: number) {
         const s = this._settingsCache.emitters;
-        for (let n in s) {
+        for (const n of Object.keys(s)) {
             s[n].floorY = value;
         }
     }
 
     public dispose() {
-        let list = this._effects;
-        let node = <BaseEffect>list.first;
+        const list = this._effects;
+        let node = list.first as BaseEffect;
         while (node) {
             node.dispose();
-            node = <BaseEffect>node.next;
+            node = node.next as BaseEffect;
         }
         list.clear();
         this.clearCache();
     }
 
-    public loadBundleFiles(bundleSettingsUrl: string, spritesheetUrl: string, spritesheetFilter: string = '', additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult> {
+    public loadBundleFiles(bundleSettingsUrl: string, spritesheetUrl: string, spritesheetFilter: string = "", additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult> {
         return new Promise((resolve, reject) => {
-            const loader = new PIXI.loaders.Loader();
+            const loader = new Loader();
             loader.onError.add((err) => {
                 reject(err);
             });
             loader
-                .add('rfx_spritesheet', spritesheetUrl)
-                .add('rfx_bundleSettings', bundleSettingsUrl);
+                .add("rfx_spritesheet", spritesheetUrl)
+                .add("rfx_bundleSettings", bundleSettingsUrl);
 
             if (additionalAssets) {
-                for (let arg of additionalAssets) {
-                    if (arg.hasOwnProperty('name') && arg.hasOwnProperty('url')) {
-                        loader.add((<IAdditionalAsset>arg).name, (<IAdditionalAsset>arg).url);
+                for (const arg of additionalAssets) {
+                    if (arg.hasOwnProperty("name") && arg.hasOwnProperty("url")) {
+                        loader.add((arg as IAdditionalAsset).name, (arg as IAdditionalAsset).url);
                     } else {
-                        loader.add(<string>arg);
+                        loader.add(arg as string);
                     }
                 }
             }
@@ -164,19 +163,19 @@ export class FX {
     public loadBundleZip(zipUrl, jszipInstance: any, additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult> {
         return new Promise((resolve, reject) => {
             if (jszipInstance == null) {
-                reject('JSZip instance not provided.');
+                reject("JSZip instance not provided.");
                 return;
             }
 
-            const loader = new PIXI.loaders.Loader();
-            loader.add('zip', zipUrl, {xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BLOB});
+            const loader = new Loader();
+            loader.add("zip", zipUrl, { xhrType: LoaderResource.XHR_RESPONSE_TYPE.BLOB });
 
             if (additionalAssets) {
-                for (let arg of additionalAssets) {
-                    if (arg.hasOwnProperty('name') && arg.hasOwnProperty('url')) {
-                        loader.add((<IAdditionalAsset>arg).name, (<IAdditionalAsset>arg).url);
+                for (const arg of additionalAssets) {
+                    if (arg.hasOwnProperty("name") && arg.hasOwnProperty("url")) {
+                        loader.add((arg as IAdditionalAsset).name, (arg as IAdditionalAsset).url);
                     } else {
-                        loader.add(<string>arg);
+                        loader.add(arg as string);
                     }
                 }
             }
@@ -195,20 +194,19 @@ export class FX {
                         list.push(entry);
                     });
 
-                    for (let n in list) {
-                        const entry = list[n];
-                        if (entry.name.indexOf('.png') != -1) {
+                    for (const entry of list) {
+                        if (entry.name.indexOf(".png") !== -1) {
 
-                            const base64 = await entry.async('base64');
+                            const base64 = await entry.async("base64");
                             spritesheetImageData = `data:image/png;base64,${base64}`;
 
-                        } else if (entry.name.indexOf('.json') != -1) {
+                        } else if (entry.name.indexOf(".json") !== -1) {
 
-                            const s = await entry.async('string');
+                            const s = await entry.async("string");
                             const def = JSON.parse(s);
                             if (def.__h) {
                                 if (def.__h !== FX._bundleHash) {
-                                    reject('Invalid settings file.');
+                                    reject("Invalid settings file.");
                                     return;
                                 }
                                 settingsDef = def;
@@ -217,8 +215,8 @@ export class FX {
                             }
                         }
                     }
-                    const texture = PIXI.Texture.from(spritesheetImageData);
-                    const spritesheet = new PIXI.Spritesheet(texture.baseTexture, spritesheetDef);
+                    const texture = Texture.from(spritesheetImageData);
+                    const spritesheet = new Spritesheet(texture.baseTexture, spritesheetDef);
                     spritesheet.parse(() => {
                         setTimeout(() => {
                             resolve(this.initBundle(settingsDef, true));
@@ -233,11 +231,11 @@ export class FX {
 
     public initBundle(bundleSettings: any, clearCache?: boolean): IParseSpriteSheetResult {
         if (bundleSettings.__h !== FX._bundleHash) {
-            throw new Error('Invalid settings file.');
+            throw new Error("Invalid settings file.");
         }
 
-        if (bundleSettings.__v != FX.settingsVersion) {
-            throw new Error('Settings version mismatch.');
+        if (bundleSettings.__v !== FX.settingsVersion) {
+            throw new Error("Settings version mismatch.");
         }
 
         Sanitizer.sanitizeBundle(bundleSettings);
@@ -245,12 +243,10 @@ export class FX {
         if (clearCache) {
             this.clearCache();
         }
-        for (let n in bundleSettings.emitters) {
-            const preset = bundleSettings.emitters[n];
+        for (const preset of bundleSettings.emitters) {
             this.addParticleEmitter(preset.id, preset);
         }
-        for (let n in bundleSettings.sequences) {
-            const preset = bundleSettings.sequences[n];
+        for (const preset of bundleSettings.sequences) {
             this.addEffectSequence(preset.id, preset);
         }
 
@@ -262,27 +258,27 @@ export class FX {
 
     public addParticleEmitter(componentId: string, settings: IEmitterSettings): FX {
 
-        if (this._settingsCache.emitters[componentId]) throw new Error(`ComponentId '${componentId}' already exists.`);
+        if (this._settingsCache.emitters[componentId]) { throw new Error(`ComponentId '${componentId}' already exists.`); }
         this._settingsCache.emitters[componentId] = settings;
         this._nameMaps.emitters[settings.name] = settings;
         return this;
     }
 
     public addEffectSequence(componentId: string, settings: IEffectSequenceSettings): FX {
-        if (this._settingsCache.effectSequences[componentId]) throw new Error(`ComponentId '${componentId}' already exists.`);
+        if (this._settingsCache.effectSequences[componentId]) { throw new Error(`ComponentId '${componentId}' already exists.`); }
         this._settingsCache.effectSequences[componentId] = settings;
         this._nameMaps.effectSequences[settings.name] = settings;
         return this;
     }
 
     public initSprite(componentId: string, settings: ISpriteSettings): FX {
-        if (this._settingsCache.sprites[componentId]) throw new Error(`ComponentId '${componentId}' already exists.`);
+        if (this._settingsCache.sprites[componentId]) { throw new Error(`ComponentId '${componentId}' already exists.`); }
         this._settingsCache.sprites[componentId] = settings;
         return this;
     }
 
     public initMovieClip(componentId: string, settings: IMovieClipSettings): FX {
-        if (this._settingsCache.mcs[componentId]) throw new Error(`ComponentId '${componentId}' already exists.`);
+        if (this._settingsCache.mcs[componentId]) { throw new Error(`ComponentId '${componentId}' already exists.`); }
         this._settingsCache.mcs[componentId] = settings;
         return this;
     }
@@ -295,13 +291,13 @@ export class FX {
         return this._settingsCache.sprites;
     }
 
-    public addContainer(key: string, container: PIXI.Container) {
+    public addContainer(key: string, container: Container) {
         this.__containers[key] = container;
     }
 
     public getEffectSequence(name: string): EffectSequence {
         const settings = this._nameMaps.effectSequences[name];
-        if (!settings) throw new Error(`Settings not defined for '${name}'`);
+        if (!settings) { throw new Error(`Settings not defined for '${name}'`); }
         return this.getEffectSequenceById(settings.id);
     }
 
@@ -309,10 +305,10 @@ export class FX {
         const pool = this._cache.effectSequences;
         let effectSequence;
 
-        let settings = <IEffectSequenceSettings>this._settingsCache.effectSequences[componentId];
-        if (!settings) throw new Error(`Settings not defined for '${componentId}'`);
+        const settings = this._settingsCache.effectSequences[componentId] as IEffectSequenceSettings;
+        if (!settings) { throw new Error(`Settings not defined for '${componentId}'`); }
 
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             effectSequence = new EffectSequence(componentId);
             effectSequence.__fx = this;
         } else {
@@ -324,7 +320,7 @@ export class FX {
 
     public getParticleEmitter(name: string, autoRecycleOnComplete: boolean = true, cloneSettings: boolean = false): ParticleEmitter {
         const settings = this._nameMaps.emitters[name];
-        if (!settings) throw new Error(`Settings not defined for '${name}'`);
+        if (!settings) { throw new Error(`Settings not defined for '${name}'`); }
         return this.getParticleEmitterById(settings.id, autoRecycleOnComplete, cloneSettings);
     }
 
@@ -332,10 +328,10 @@ export class FX {
         const pool = this._cache.emitters;
         let emitter;
 
-        let settings = <IParticleSettings>this._settingsCache.emitters[componentId];
-        if (!settings) throw new Error(`Settings not defined for '${componentId}'`);
+        let settings = this._settingsCache.emitters[componentId] as IParticleSettings;
+        if (!settings) { throw new Error(`Settings not defined for '${componentId}'`); }
 
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             emitter = new ParticleEmitter(componentId);
             emitter.__fx = this;
         } else {
@@ -363,17 +359,17 @@ export class FX {
 
     public stopAllEffects() {
         const list = this._effects.toArray();
-        for (let node of list) {
-            (<BaseEffect>node).recycle();
+        for (const node of list) {
+            (node as BaseEffect).recycle();
         }
     }
 
-    public parseSpriteSheet(spriteSheet: PIXI.Spritesheet, filter?: string): IParseSpriteSheetResult {
+    public parseSpriteSheet(spriteSheet: Spritesheet, filter?: string): IParseSpriteSheetResult {
         return this.parseObject(spriteSheet.data.frames, filter);
     }
 
     public parseTextureCache(filter?: string): IParseSpriteSheetResult {
-        return this.parseObject(PIXI.utils.TextureCache, filter);
+        return this.parseObject(utils.TextureCache, filter);
     }
 
     public get active(): boolean {
@@ -392,7 +388,6 @@ export class FX {
         this._effects.remove(effect);
     }
 
-
     public __getSprite(componentId: string): Sprite {
         const cache = this._cache.sprites;
         let pool = cache[componentId];
@@ -401,9 +396,9 @@ export class FX {
             pool = cache[componentId] = [];
         }
 
-        if (pool.length == 0) {
-            const settings = <ISpriteSettings>this._settingsCache.sprites[componentId];
-            if (settings == null) throw new Error(`Settings not defined for '${componentId}'`);
+        if (pool.length === 0) {
+            const settings = this._settingsCache.sprites[componentId] as ISpriteSettings;
+            if (settings == null) { throw new Error(`Settings not defined for '${componentId}'`); }
             const sprite = new Sprite(componentId, settings.texture, settings.anchorX, settings.anchorY);
             sprite.__fx = this;
             return sprite;
@@ -419,9 +414,9 @@ export class FX {
             pool = cache[componentId] = [];
         }
 
-        if (pool.length == 0) {
-            let settings = <IMovieClipSettings>this._settingsCache.mcs[componentId];
-            if (settings == null) throw new Error(`Settings not defined for '${componentId}'`);
+        if (pool.length === 0) {
+            const settings = this._settingsCache.mcs[componentId] as IMovieClipSettings;
+            if (settings == null) { throw new Error(`Settings not defined for '${componentId}'`); }
             const mc = new MovieClip(componentId, settings.textures, settings.anchorX, settings.anchorY);
             mc.__fx = this;
             return mc;
@@ -430,10 +425,10 @@ export class FX {
     }
 
     public __getParticle(): Particle {
-        let cache = this._cache,
-            pool = cache.particles;
+        const cache = this._cache;
+        const pool = cache.particles;
 
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             const particle = new Particle();
             particle.__fx = this;
             return particle;
@@ -442,14 +437,14 @@ export class FX {
     }
 
     public __getEmitterCore(type: string, emitter: ParticleEmitter): BaseEmitterCore {
-        let cache = this._cache.cores;
+        const cache = this._cache.cores;
         let pool = cache[type];
 
         if (pool == null) {
             pool = cache[type] = [];
         }
 
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             return new FX.__emitterCores[type](type);
 
         }
@@ -490,29 +485,28 @@ export class FX {
 
         const frames = object;
         const mcs = {};
-        const result: IParseSpriteSheetResult = {sprites: [], movieClips: []};
-        for (let i in frames) {
-            if (filter && i.indexOf(filter) == -1) {
+        const result: IParseSpriteSheetResult = { sprites: [], movieClips: [] };
+        for (const i of Object.keys(frames)) {
+            if (filter && i.indexOf(filter) === -1) {
                 continue;
             }
-            this.initSprite(i, {texture: i, anchorX: 0.5, anchorY: 0.5});
+            this.initSprite(i, { texture: i, anchorX: 0.5, anchorY: 0.5 });
             result.sprites.push(i);
-            if (i.substr(0, 3) == 'mc_') {
-                const parts = i.split('_');
+            if (i.substr(0, 3) === "mc_") {
+                const parts = i.split("_");
                 const group = parts[1];
-                if (mcs[group] == null) mcs[group] = [];
+                if (mcs[group] == null) { mcs[group] = []; }
                 mcs[group].push(i);
             }
         }
-        for (let i in mcs) {
-            let textures = mcs[i];
+        for (const i of Object.keys(mcs)) {
+            const textures = mcs[i];
             result.movieClips.push(i);
-            this.initMovieClip(i, {textures: textures, anchorX: 0.5, anchorY: 0.5});
+            this.initMovieClip(i, { textures, anchorX: 0.5, anchorY: 0.5 });
         }
         return result;
     }
 }
-
 
 // *********************************************************************************************
 // * Interfaces												                                        							   *
@@ -603,7 +597,7 @@ export interface ICoreSettings {
     type: string;
     params: ICircleCoreParams |
         IRingCoreParams |
-        IBoxCoreParams
+        IBoxCoreParams;
 }
 
 export interface ICircleCoreParams {
@@ -744,6 +738,3 @@ export interface IAdditionalAsset {
     name: string;
     url: string;
 }
-
-
-

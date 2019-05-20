@@ -1,6 +1,5 @@
 export class Color {
 
-
   public r: number;
   public g: number;
   public b: number;
@@ -53,7 +52,6 @@ export class Color {
     this.rgb = (this.r << 16) | (this.g << 8) | this.b;
     return this.rgb;
   }
-
 
   // *********************************************************************************************
   // * Private					                                        															   *

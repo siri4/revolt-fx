@@ -1,21 +1,20 @@
 /// <reference types="pixi.js" />
 
-import {Node} from "./util/LinkedList";
-import {IParticle, IParticleSettings, FX, IParticleEmitterParent} from "./FX";
-import {Sprite} from "./Sprite";
-import {IParticleEmitterSignals, ParticleEmitter} from "./ParticleEmitter";
-import {Color} from "./util/Color";
-import {Easing} from "./util/Easing";
-import {Rnd} from "./util/Rnd";
-import {MovieClip} from "./MovieClip";
-import {FXSignal} from "./util/FXSignal";
+import { FX, IParticle, IParticleEmitterParent, IParticleSettings } from "./FX";
+import { MovieClip } from "./MovieClip";
+import { ParticleEmitter } from "./ParticleEmitter";
+import { Sprite } from "./Sprite";
+import { Color } from "./util/Color";
+import { Easing } from "./util/Easing";
+import { FXSignal } from "./util/FXSignal";
+import { Node } from "./util/LinkedList";
+import { Rnd } from "./util/Rnd";
 
 export interface IParticleSignals {
     died: FXSignal;
     bounced: FXSignal;
     updated: FXSignal;
 }
-
 
 export class Particle extends Node implements IParticle, IParticleEmitterParent {
 
@@ -98,7 +97,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
     private _color: Color;
     private _dt: number;
 
-    private _spawnOnBounce: Boolean;
+    private _spawnOnBounce: boolean;
 
     private _childEmitters: ParticleEmitter[] = [];
     private _hasChildEmitters: boolean = false;
@@ -110,7 +109,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
     public __on: IParticleSignals = {
         died: new FXSignal(),
         bounced: new FXSignal(),
-        updated: new FXSignal()
+        updated: new FXSignal(),
     };
 
     constructor() {
@@ -125,7 +124,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
     public init(emitter: ParticleEmitter, settings: IParticleSettings, scaleMod?: number): IParticle {
 
         const component = this.component;
-        const transform = <PIXI.Transform>component.transform;
+        const transform = component.transform;
         const fx = this.__fx;
 
         this.emitter = emitter;
@@ -181,7 +180,6 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             }
         }
 
-
         if (settings.useRotation && settings.randomStartRotation && !this.useAlign) {
             transform.rotation = Rnd.float(0, 6.28319);
         }
@@ -195,10 +193,9 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             if (settings.fadeIn) {
                 this.alphaDuration = duration * (1 - settings.fadeInDurationFac);
                 this.fadeInDuration = duration * settings.fadeInDurationFac;
-                this.fadeInEase = Easing[settings.fadeInEase || 'easeInSine'];
+                this.fadeInEase = Easing[settings.fadeInEase || "easeInSine"];
             }
         }
-
 
         if (settings.useScale) {
             this.uniformScale = settings.uniformScale;
@@ -223,7 +220,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
                 if (settings.scaleIn) {
                     this.scaleDuration = duration * (1 - settings.scaleInDurationFac);
                     this.scaleInDuration = duration * settings.scaleInDurationFac;
-                    this.scaleInEase = Easing[settings.scaleInEase || 'easeInSine'];
+                    this.scaleInEase = Easing[settings.scaleInEase || "easeInSine"];
                 }
 
             } else {
@@ -237,10 +234,9 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             }
         }
 
-
         if (settings.useRotation) {
             this.rotationSpeed = Rnd.float(settings.rotationSpeedMin, settings.rotationSpeedMax) * scaleMod;
-            if (settings.randomRotationDirection) this.rotationSpeed *= Rnd.sign();
+            if (settings.randomRotationDirection) { this.rotationSpeed *= Rnd.sign(); }
         }
 
         if (settings.useTint) {
@@ -293,10 +289,10 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
         }
 
         const component = this.component;
-        const transform = <PIXI.Transform>component.transform;
+        const transform = component.transform;
         const mod = t * dt;
 
-        //Motion
+        // Motion
         if (this.useGravity) {
             const dt2 = dt / 0.0166666;
             transform.position.x += this.moveSpeedX * dt2;
@@ -341,41 +337,33 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             }
         }
 
-        //Alpha
+        // Alpha
         if (this.useAlpha) {
-            if (this.useFadeIn) {
-                if (t < this.fadeInDuration) {
-                    component.alpha = this.fadeInEase(t, 0, this.alphaStart, this.fadeInDuration);
-                } else {
-                    component.alpha = this.alphaEase(t - this.fadeInDuration, this.alphaStart, this.alphaDelta, this.alphaDuration);
-                }
-            } else {
-                if (this.alphaEase) {
-                    component.alpha = this.alphaEase(t, this.alphaStart, this.alphaDelta, duration)
-                } else {
-                    component.alpha = (this.alphaDelta) * mod + this.alphaStart;
-                }
-            }
+            component.alpha = this.useFadeIn
+                ? t < this.fadeInDuration
+                    ? this.fadeInEase(t, 0, this.alphaStart, this.fadeInDuration)
+                    : this.alphaEase(t - this.fadeInDuration, this.alphaStart, this.alphaDelta, this.alphaDuration)
+                : this.alphaEase
+                    ? this.alphaEase(t, this.alphaStart, this.alphaDelta, duration)
+                    : (this.alphaDelta) * mod + this.alphaStart;
         }
 
-        //Rotation
+        // Rotation
         if (this.useRotation) {
             transform.rotation += this.rotationSpeed;
         }
 
-        //Scale
+        // Scale
         if (this.useScale) {
             if (this.uniformScale) {
                 if (this.useScaleIn) {
-                    if (t < this.scaleInDuration) {
-                        transform.scale.x = transform.scale.y = this.scaleInEase(t, 0, this.scaleStart, this.scaleInDuration);
-                    } else {
-                        transform.scale.x = transform.scale.y = this.scaleEase(t - this.scaleInDuration, this.scaleStart, this.scaleDelta, this.scaleDuration);
-                    }
+                    transform.scale.x = t < this.scaleInDuration
+                        ? (transform.scale.y = this.scaleInEase(t, 0, this.scaleStart, this.scaleInDuration))
+                        : (transform.scale.y = this.scaleEase(t - this.scaleInDuration, this.scaleStart, this.scaleDelta, this.scaleDuration));
                 } else {
                     if (this.scaleEase) {
                         transform.scale.x = this.scaleEase(t, this.scaleStart, this.scaleDelta, duration);
-                        transform.scale.y = this.scaleEase(t, this.scaleStart, this.scaleDelta, duration)
+                        transform.scale.y = this.scaleEase(t, this.scaleStart, this.scaleDelta, duration);
                     } else {
                         transform.scale.x = transform.scale.y = this.scaleDelta * mod + this.scaleStart;
                     }
@@ -390,28 +378,23 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
                         transform.scale.y = this.scaleEase(t - this.scaleInDuration, this.scaleYStart, this.scaleYDelta, this.scaleDuration);
                     }
                 } else {
-                    if (this.scaleXEase) {
-                        transform.scale.x = this.scaleXEase(t, this.scaleXStart, this.scaleXDelta, duration);
-                    } else {
-                        transform.scale.x = this.scaleXDelta * mod + this.scaleXStart;
-                    }
-                    if (this.scaleYEase) {
-                        transform.scale.y = this.scaleYEase(t, this.scaleYStart, this.scaleYDelta, duration);
-                    } else {
-                        transform.scale.y = this.scaleYDelta * mod + this.scaleYStart;
-                    }
+                    transform.scale.x = this.scaleXEase
+                        ? this.scaleXEase(t, this.scaleXStart, this.scaleXDelta, duration)
+                        : this.scaleXDelta * mod + this.scaleXStart;
+                    transform.scale.y = this.scaleYEase
+                        ? this.scaleYEase(t, this.scaleYStart, this.scaleYDelta, duration)
+                        : this.scaleYDelta * mod + this.scaleYStart;
                 }
             }
 
-
         }
 
-        //Tint
+        // Tint
         if (this.useTint) {
             component.tint = this._color.tween(this.tintEase, t, duration);
         }
 
-        //Spawn t = 0.5
+        // Spawn t = 0.5
         if (this._spawnOnHalfway) {
             if (t >= 0.5) {
                 this._spawnOnHalfway = false;
@@ -424,7 +407,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             let l = childs.length;
             while (--l > -1) {
                 const child = childs[l];
-                if (child.__recycled) continue;
+                if (child.__recycled) { continue; }
                 child.x = component.position.x;
                 child.y = transform.position.y;
                 if (child.__adoptRotation) {
@@ -473,7 +456,6 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
             this._hasChildEmitters = false;
         }
 
-
         this.component.recycle();
         this.__fx.__recycleParticle(this);
         this.dx = this.dy = this.deltaX = this.deltaY = 0;
@@ -503,7 +485,6 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
         return this.__on;
     }
 
-
     // *********************************************************************************************
     // * Internal																                                        				   *
     // *********************************************************************************************
@@ -512,7 +493,7 @@ export class Particle extends Node implements IParticle, IParticleEmitterParent 
         const index = this._childEmitters.indexOf(emitter);
         if (index > -1) {
             this._childEmitters.splice(index, 1);
-            if (this._childEmitters.length == 0) this._hasChildEmitters = false;
+            if (this._childEmitters.length === 0) { this._hasChildEmitters = false; }
         }
     }
 

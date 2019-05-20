@@ -1,11 +1,11 @@
-/// <reference types="pixi.js" />
-import { ParticleEmitter } from "./ParticleEmitter";
+import { Container, Spritesheet } from "pixi.js";
 import { BaseEffect } from "./BaseEffect";
-import { EffectSequence } from "./EffectSequence";
-import { Sprite } from "./Sprite";
-import { Particle } from "./Particle";
 import { BaseEmitterCore } from "./core/BaseEmitterCore";
+import { EffectSequence } from "./EffectSequence";
 import { MovieClip } from "./MovieClip";
+import { Particle } from "./Particle";
+import { ParticleEmitter } from "./ParticleEmitter";
+import { Sprite } from "./Sprite";
 declare enum ComponentType {
     Sprite = 0,
     MovieClip = 1
@@ -25,7 +25,6 @@ export declare class FX {
     effectSequenceCount: number;
     maxParticles: number;
     particleFac: number;
-    fix: any;
     private _active;
     private _timeElapsed;
     private _cache;
@@ -33,9 +32,8 @@ export declare class FX {
     private _nameMaps;
     private _effects;
     __containers: {
-        [key: string]: PIXI.Container;
+        [key: string]: Container;
     };
-    static ComponentType: any;
     static EffectSequenceComponentType: any;
     static __emitterCores: any;
     constructor();
@@ -58,14 +56,14 @@ export declare class FX {
     getSprites(): {
         [key: string]: ISpriteSettings;
     };
-    addContainer(key: string, container: PIXI.Container): void;
+    addContainer(key: string, container: Container): void;
     getEffectSequence(name: string): EffectSequence;
     getEffectSequenceById(componentId: string): EffectSequence;
     getParticleEmitter(name: string, autoRecycleOnComplete?: boolean, cloneSettings?: boolean): ParticleEmitter;
     getParticleEmitterById(componentId: string, autoRecycleOnComplete?: boolean, cloneSettings?: boolean): ParticleEmitter;
     stopEmitter(emitter: ParticleEmitter, dispose?: boolean): void;
     stopAllEffects(): void;
-    parseSpriteSheet(spriteSheet: PIXI.Spritesheet, filter?: string): IParseSpriteSheetResult;
+    parseSpriteSheet(spriteSheet: Spritesheet, filter?: string): IParseSpriteSheetResult;
     parseTextureCache(filter?: string): IParseSpriteSheetResult;
     readonly active: boolean;
     __addActiveEffect(effect: BaseEffect): void;

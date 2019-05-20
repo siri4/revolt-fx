@@ -1,6 +1,6 @@
-/// <reference types="pixi.js" />
+import { Sprite as PixiSprite } from "pixi.js";
 import { FX } from "./FX";
-export declare class Sprite extends PIXI.Sprite {
+export declare class Sprite extends PixiSprite {
     componentId: string;
     __sequenceEndTime: number;
     __fx: FX;

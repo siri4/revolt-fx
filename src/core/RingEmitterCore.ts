@@ -1,7 +1,6 @@
-/// <reference types="pixi.js" />
+// <reference types="pixi.js" />
 
 import {BaseEmitterCore} from "./BaseEmitterCore";
-import {ParticleEmitter} from "../ParticleEmitter";
 import {Particle} from "../Particle";
 import {IRingCoreParams} from "../FX";
 import {Rnd} from "../util/Rnd";
@@ -48,17 +47,17 @@ export class RingEmitterCore extends BaseEmitterCore {
         }
 
         const r = settings.radius * this.__scaleMod;
-        (<PIXI.Transform> particle.component.transform).position.x = (this.__x + this._t * (this.x - this.__x)) + Math.cos(angle) * r;
-        (<PIXI.Transform> particle.component.transform).position.y = (this.__y + this._t * (this.y - this.__y)) + Math.sin(angle) * r;
+        particle.component.transform.position.x = (this.__x + this._t * (this.x - this.__x)) + Math.cos(angle) * r;
+        particle.component.transform.position.y = (this.__y + this._t * (this.y - this.__y)) + Math.sin(angle) * r;
 
         if (settings.radial) {
             particle.dx = Math.cos(angle);
             particle.dy = Math.sin(angle);
-            (<PIXI.Transform> particle.component.transform).rotation = angle;
+            particle.component.transform.rotation = angle;
         } else {
             particle.dx = this._dx;
             particle.dy = this._dy;
-            (<PIXI.Transform> particle.component.transform).rotation = emitter.rotation;
+            particle.component.transform.rotation = emitter.rotation;
         }
 
         this._t += this._posInterpolationStep;

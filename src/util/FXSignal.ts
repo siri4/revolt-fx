@@ -1,12 +1,9 @@
-import {LinkedList, Node} from "./LinkedList";
-import {Particle} from "../Particle";
-import {ParticleEmitter} from "../ParticleEmitter";
+import { LinkedList, Node } from "./LinkedList";
 
 export class FXSignal {
 
     public __hasCallback: boolean = false;
     private _list: LinkedList = new LinkedList();
-
 
     constructor() {
     }
@@ -29,9 +26,9 @@ export class FXSignal {
         while (node) {
             next = node.next;
             let call = true;
-            const data = <FXSignalListener>node.data;
+            const data = node.data as FXSignalListener;
             if (data.callRate) {
-                if (data.calls % data.callRate != 0) {
+                if (data.calls % data.callRate !== 0) {
                     call = false;
                 }
             }
@@ -69,10 +66,9 @@ export class FXSignal {
 }
 
 export class FXSignalListener {
-    public calls:number = 0;
+    public calls: number = 0;
     constructor(public callback: Function,
                 public scope?: any,
                 public once?: boolean,
-                public callRate?:number)
-    {}
+                public callRate?: number) {}
 }
