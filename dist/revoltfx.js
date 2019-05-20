@@ -1872,8 +1872,7 @@ var Sanitizer = (function () {
         }
     };
     Sanitizer.parse = function (bundleObject, structureObject, spawnStructureObject) {
-        for (var _i = 0, _a = Object.keys(structureObject); _i < _a.length; _i++) {
-            var propName = _a[_i];
+        for (var propName in structureObject) {
             if (bundleObject[propName] == null) {
                 bundleObject[propName] = structureObject[propName];
             }
@@ -1887,10 +1886,9 @@ var Sanitizer = (function () {
                     Sanitizer.parse(bundleProp, structureProp, spawnStructureObject);
                 }
                 else {
-                    for (var _b = 0, bundleProp_1 = bundleProp; _b < bundleProp_1.length; _b++) {
-                        var spawn = bundleProp_1[_b];
-                        for (var _c = 0, _d = Object.keys(spawnStructureObject); _c < _d.length; _c++) {
-                            var spawnPropName = _d[_c];
+                    for (var _i = 0, bundleProp_1 = bundleProp; _i < bundleProp_1.length; _i++) {
+                        var spawn = bundleProp_1[_i];
+                        for (var spawnPropName in spawnStructureObject) {
                             if (spawn[spawnPropName] == null) {
                                 spawn[spawnPropName] = spawnStructureObject[spawnPropName];
                             }
@@ -2166,7 +2164,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = require("..");
+var Rnd_1 = require("../util/Rnd");
 var BaseEmitterCore_1 = require("./BaseEmitterCore");
 var BoxEmitterCore = (function (_super) {
     __extends(BoxEmitterCore, _super);
@@ -2179,8 +2177,8 @@ var BoxEmitterCore = (function (_super) {
         var w2 = settings.width * 0.5 * this.__scaleMod;
         var h2 = settings.height * 0.5 * this.__scaleMod;
         var angle = emitter.rotation;
-        var x = __1.Rnd.float(-w2, w2);
-        var y = __1.Rnd.float(-h2, h2);
+        var x = Rnd_1.Rnd.float(-w2, w2);
+        var y = Rnd_1.Rnd.float(-h2, h2);
         if (angle !== 0) {
             particle.component.transform.position.x = (this.__x + this._t * (this.x - this.__x)) + x * Math.cos(angle) - y * Math.sin(angle);
             particle.component.transform.position.y = (this.__y + this._t * (this.y - this.__y)) + x * Math.sin(angle) + y * Math.cos(angle);
@@ -2205,7 +2203,7 @@ var BoxEmitterCore = (function (_super) {
 }(BaseEmitterCore_1.BaseEmitterCore));
 exports.BoxEmitterCore = BoxEmitterCore;
 
-},{"..":13,"./BaseEmitterCore":9}],11:[function(require,module,exports){
+},{"../util/Rnd":18,"./BaseEmitterCore":9}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
