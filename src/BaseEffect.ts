@@ -1,9 +1,10 @@
-import {IEffectSequenceSettings, IEmitterSettings, FX, IParticleEmitterParent} from "./FX";
-import {Node} from "./util/LinkedList";
+import { Container, Point } from "pixi.js";
+import { FX, IEffectSequenceSettings, IEmitterSettings } from "./FX";
+import { Node } from "./util/LinkedList";
 
 export class BaseEffect extends Node  {
 
-    public container: PIXI.Container;
+    public container: Container;
     public exhausted: boolean = false;
     public completed: boolean = false;
 
@@ -16,14 +17,13 @@ export class BaseEffect extends Node  {
     protected _rotation: number = 0;
     protected _alpha: number = 0;
 
-    protected _scale: PIXI.Point = new PIXI.Point();
+    protected _scale: Point = new Point();
     protected _time: number;
 
     protected _active: boolean = false;
 
     public __fx: FX;
     public __recycled: boolean = true;
-
 
     constructor(public componentId: string) {
         super();
@@ -32,7 +32,6 @@ export class BaseEffect extends Node  {
     // *********************************************************************************************
     // * Public																					                                           *
     // *********************************************************************************************
-
 
     public update(dt: number) {
 
@@ -46,11 +45,11 @@ export class BaseEffect extends Node  {
         return this._active;
     }
 
-    public get scale(): PIXI.Point {
+    public get scale(): Point {
         return this._scale;
     }
 
-    public set scale(value: PIXI.Point) {
+    public set scale(value: Point) {
         this._scale = value;
     }
 

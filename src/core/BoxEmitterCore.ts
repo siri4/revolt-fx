@@ -1,11 +1,9 @@
-/// <reference types="pixi.js" />
+// <reference types="pixi.js" />
 
-import {IBoxCoreParams} from "../FX";
-import {Particle} from "../Particle";
-import {ParticleEmitter} from "../ParticleEmitter";
-import {BaseEmitterCore} from "./BaseEmitterCore";
-import {Rnd} from "../util/Rnd";
-
+import { Rnd } from "..";
+import { IBoxCoreParams } from "../FX";
+import { Particle } from "../Particle";
+import { BaseEmitterCore } from "./BaseEmitterCore";
 
 export class BoxEmitterCore extends BaseEmitterCore {
 
@@ -19,7 +17,7 @@ export class BoxEmitterCore extends BaseEmitterCore {
 
     public emit(particle: Particle) {
 
-        const settings = <IBoxCoreParams>this._settings;
+        const settings = this._settings as IBoxCoreParams;
         const emitter = this.emitter;
 
         const w2 = settings.width * 0.5 * this.__scaleMod;
@@ -30,12 +28,12 @@ export class BoxEmitterCore extends BaseEmitterCore {
         const x = Rnd.float(-w2, w2);
         const y = Rnd.float(-h2, h2);
 
-        if (angle != 0) {
-            (<PIXI.Transform> particle.component.transform).position.x = (this.__x + this._t * (this.x - this.__x)) + x * Math.cos(angle) - y * Math.sin(angle);
-            (<PIXI.Transform> particle.component.transform).position.y = (this.__y + this._t * (this.y - this.__y)) + x * Math.sin(angle) + y * Math.cos(angle);
+        if (angle !== 0) {
+            particle.component.transform.position.x = (this.__x + this._t * (this.x - this.__x)) + x * Math.cos(angle) - y * Math.sin(angle);
+            particle.component.transform.position.y = (this.__y + this._t * (this.y - this.__y)) + x * Math.sin(angle) + y * Math.cos(angle);
         } else {
-            (<PIXI.Transform> particle.component.transform).position.x = this.__x + this._t * (this.x - this.__x) + x;
-            (<PIXI.Transform> particle.component.transform).position.y = this.__y + this._t * (this.y - this.__y) + y;
+            particle.component.transform.position.x = this.__x + this._t * (this.x - this.__x) + x;
+            particle.component.transform.position.y = this.__y + this._t * (this.y - this.__y) + y;
         }
 
         if (settings.radial) {
@@ -47,7 +45,7 @@ export class BoxEmitterCore extends BaseEmitterCore {
             particle.dy = this._dy;
         }
 
-        (<PIXI.Transform> particle.component.transform).rotation = angle;
+        particle.component.transform.rotation = angle;
 
         this._t += this._posInterpolationStep;
 
@@ -60,6 +58,5 @@ export class BoxEmitterCore extends BaseEmitterCore {
     // *********************************************************************************************
     // * Events																                                        					   *
     // *********************************************************************************************
-
 
 }

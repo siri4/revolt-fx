@@ -1,5 +1,5 @@
-import { Particle } from "../Particle";
 import { IBoxCoreParams, ICircleCoreParams, IRingCoreParams } from "../FX";
+import { Particle } from "../Particle";
 import { ParticleEmitter } from "../ParticleEmitter";
 export declare class BaseEmitterCore {
     type: string;

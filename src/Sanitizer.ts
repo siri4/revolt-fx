@@ -1,35 +1,35 @@
-import {FX} from "./FX";
-
 export class Sanitizer {
 
     public static sanitizeBundle(bundle: any) {
 
-        for (let emitter of bundle.emitters) {
+        for (const emitter of bundle.emitters) {
             const structure = Sanitizer._presetStructure.emitter;
             Sanitizer.parse(emitter, structure,  Sanitizer._presetStructure.emitterSpawn);
         }
 
-        for (let sequence of bundle.sequences) {
+        for (const sequence of bundle.sequences) {
             const structure = Sanitizer._presetStructure.sequence;
             Sanitizer.parse(sequence, structure,  Sanitizer._presetStructure.sequenceEffect);
         }
     }
 
-    private static parse(bundleObject: any, structureObject: any, spawnStructureObject:any) {
-        for (let propName in structureObject) {
+    private static parse(bundleObject: any, structureObject: any, spawnStructureObject: any) {
+        for (const propName of Object.keys(structureObject)) {
             if (bundleObject[propName] == null) {
                 bundleObject[propName] = structureObject[propName];
             } else {
                 const bundleProp = bundleObject[propName];
 
-                if (typeof bundleProp !== 'object') continue;
+                if (typeof bundleProp !== "object") {
+                    continue;
+                }
 
                 const structureProp = structureObject[propName];
-                if (!bundleProp.hasOwnProperty('length')) {
+                if (!bundleProp.hasOwnProperty("length")) {
                     Sanitizer.parse(bundleProp, structureProp, spawnStructureObject);
                 } else {
-                    for (let spawn of bundleProp) {
-                        for (let spawnPropName in spawnStructureObject) {
+                    for (const spawn of bundleProp) {
+                        for (const spawnPropName of Object.keys(spawnStructureObject)) {
                             if (spawn[spawnPropName] == null) {
                                 spawn[spawnPropName] = spawnStructureObject[spawnPropName];
                             }
@@ -43,12 +43,12 @@ export class Sanitizer {
     private static _presetStructure: any = {
         sequence: {
             id: 0,
-            name: '',
+            name: "",
             type: 1,
             delay: 0,
             scaleMin: 1,
             scaleMax: 1,
-            effects: []
+            effects: [],
         },
         sequenceEffect: {
             id: 0,
@@ -60,7 +60,7 @@ export class Sanitizer {
                 animationSpeedMax: 1,
                 anchorX: 0.5,
                 anchorY: 0.5,
-                loop: false
+                loop: false,
             },
             scaleMin: 1,
             scaleMax: 1,
@@ -71,23 +71,23 @@ export class Sanitizer {
             blendMode: 0,
             duration: 0.1,
             tint: 0xffffff,
-            containerId: '',
-            triggerValue: ''
+            containerId: "",
+            triggerValue: "",
         },
         emitter: {
             id: 0,
-            name: '',
+            name: "",
             type: 0,
             core: {
-                type: 'circle',
+                type: "circle",
                 params: {
                     radius: 100,
                     radial: true,
                     angle: 6.28318530718,
                     uniform: false,
                     width: 100,
-                    height: 100
-                }
+                    height: 100,
+                },
             },
             spawnFrequencyMin: 0.1,
             spawnFrequencyMax: 0.1,
@@ -104,19 +104,19 @@ export class Sanitizer {
             autoRotation: 0,
             particleSettings: {
                 componentType: 0,
-                componentId: '',
+                componentId: "",
                 componentParams: {
                     animationSpeedMin: 1,
                     animationSpeedMax: 1,
                     anchorX: 0.5,
                     anchorY: 0.5,
-                    loop: false
+                    loop: false,
                 },
                 durationMin: 1,
                 durationMax: 2,
                 distanceMin: 0,
                 distanceMax: 0,
-                distanceEase: 'linear',
+                distanceEase: "linear",
                 moveSpeedMin: 0,
                 moveSpeedMax: 0,
                 bounceFacMin: 0,
@@ -140,50 +140,50 @@ export class Sanitizer {
                 randomStartRotation: false,
                 fadeIn: true,
                 fadeInDurationFac: 0.1,
-                fadeInEase: 'linear',
+                fadeInEase: "linear",
                 alphaStartMin: 0.7,
                 alphaStartMax: 0.9,
                 alphaEndMin: 0.7,
                 alphaEndMax: 0.8,
-                alphaEase: 'linear',
+                alphaEase: "linear",
                 tintStart: 0xffffff,
                 tintEnd: 0xffffff,
-                tintEase: 'linear',
+                tintEase: "linear",
                 scaleIn: false,
                 scaleInDurationFac: 0.2,
-                scaleInEase: 'linear',
+                scaleInEase: "linear",
                 uniformScale: true,
                 scaleXStartMin: 1,
                 scaleXStartMax: 1,
                 scaleXEndMin: 1,
                 scaleXEndMax: 1,
-                scaleXEase: 'linear',
+                scaleXEase: "linear",
                 scaleYStartMin: 1,
                 scaleYStartMax: 1,
                 scaleYEndMin: 1,
                 scaleYEndMax: 1,
-                scaleYEase: 'linear',
+                scaleYEase: "linear",
                 scaleStartMin: 1,
                 scaleStartMax: 1,
                 scaleEndMin: 1,
                 scaleEndMax: 1,
-                scaleEase: 'linear',
+                scaleEase: "linear",
                 childs: [],
                 spawn: {
                     onComplete: [],
                     onBounce: [],
                     onHalfway: [],
-                    onStart: []
-                }
+                    onStart: [],
+                },
             },
-            childs: []
+            childs: [],
         },
         emitterSpawn: {
             type: 0,
             id: 0,
             scale: 1,
             adoptRotation: true,
-            containerId: ''
-        }
+            containerId: "",
+        },
     };
 }

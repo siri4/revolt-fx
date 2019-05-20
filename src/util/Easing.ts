@@ -12,7 +12,6 @@ export class Easing {
     return -c * (t /= d) * (t - 2) + b;
   }
 
-
   public static easeInOutQuad(t: number, b: number, c: number, d: number): number {
     if ((t /= d / 2) < 1) {
       return c / 2 * t * t + b;
@@ -99,10 +98,10 @@ export class Easing {
 
   public static easeInOutExpo(t: number, b: number, c: number, d: number): number {
     if (t === 0) {
-      b;
+      return b;
     }
     if (t === d) {
-      b + c;
+      return b + c;
     }
     if ((t /= d / 2) < 1) {
       return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
@@ -128,14 +127,13 @@ export class Easing {
   }
 
   public static easeInElastic(t: number, b: number, c: number, d: number): number {
-    let a: number, p: number, s: number;
-    s = 1.70158;
-    p = 0;
-    a = c;
+    let a: number = c;
+    let p: number = 0;
+    let s: number = 1.70158;
     if (t === 0) {
-      b;
+      return b;
     } else if ((t /= d) === 1) {
-      b + c;
+      return b + c;
     }
     if (!p) {
       p = d * .3;
@@ -150,14 +148,13 @@ export class Easing {
   }
 
   public static easeOutElastic(t: number, b: number, c: number, d: number): number {
-    let a: number, p: number, s: number;
-    s = 1.70158;
-    p = 0;
-    a = c;
+    let a: number = c;
+    let p: number = 0;
+    let s: number = 1.70158;
     if (t === 0) {
-      b;
+      return b;
     } else if ((t /= d) === 1) {
-      b + c;
+      return b + c;
     }
     if (!p) {
       p = d * .3;
@@ -172,14 +169,13 @@ export class Easing {
   }
 
   public static easeInOutElastic(t: number, b: number, c: number, d: number): number {
-    let a: number, p: number, s: number;
-    s = 1.70158;
-    p = 0;
-    a = c;
+    let a: number = c;
+    let p: number = 0;
+    let s: number = 1.70158;
     if (t === 0) {
-      b;
+      return b;
     } else if ((t /= d / 2) === 2) {
-      b + c;
+      return b + c;
     }
     if (!p) {
       p = d * (.3 * 1.5);

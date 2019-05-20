@@ -1,7 +1,7 @@
-/// <reference types="pixi.js" />
+import { Container, DisplayObject } from "pixi.js";
 import { BaseEffect } from "./BaseEffect";
-import { IEmitterSettings, IParticleEmitterParent } from "./FX";
 import { BaseEmitterCore } from "./core/BaseEmitterCore";
+import { IEmitterSettings, IParticleEmitterParent } from "./FX";
 import { Particle } from "./Particle";
 import { FXSignal } from "./util/FXSignal";
 export interface IParticleEmitterSignals {
@@ -15,7 +15,7 @@ export interface IParticleEmitterSignals {
 }
 export declare class ParticleEmitter extends BaseEffect implements IParticleEmitterParent {
     infinite: boolean;
-    target: PIXI.DisplayObject;
+    target: DisplayObject;
     targetOffset: number;
     core: BaseEmitterCore;
     settings: IEmitterSettings;
@@ -34,7 +34,7 @@ export declare class ParticleEmitter extends BaseEffect implements IParticleEmit
     __adoptRotation: boolean;
     __on: IParticleEmitterSignals;
     constructor(componentId: string);
-    init(container: PIXI.Container, autoStart?: boolean, scaleMod?: number): ParticleEmitter;
+    init(container: Container, autoStart?: boolean, scaleMod?: number): ParticleEmitter;
     start(): ParticleEmitter;
     stop(waitForParticles?: boolean): void;
     update(dt: number): ParticleEmitter;

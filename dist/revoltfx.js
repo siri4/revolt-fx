@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var pixi_js_1 = require("pixi.js");
 var LinkedList_1 = require("./util/LinkedList");
 var BaseEffect = (function (_super) {
     __extends(BaseEffect, _super);
@@ -26,7 +27,7 @@ var BaseEffect = (function (_super) {
         _this._y = 0;
         _this._rotation = 0;
         _this._alpha = 0;
-        _this._scale = new PIXI.Point();
+        _this._scale = new pixi_js_1.Point();
         _this._active = false;
         _this.__recycled = true;
         return _this;
@@ -98,7 +99,7 @@ var BaseEffect = (function (_super) {
 }(LinkedList_1.Node));
 exports.BaseEffect = BaseEffect;
 
-},{"./util/LinkedList":17}],2:[function(require,module,exports){
+},{"./util/LinkedList":17,"pixi.js":undefined}],2:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -114,12 +115,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var FX_1 = require("./FX");
 var BaseEffect_1 = require("./BaseEffect");
-var LinkedList_1 = require("./util/LinkedList");
+var FX_1 = require("./FX");
 var ParticleEmitter_1 = require("./ParticleEmitter");
-var Rnd_1 = require("./util/Rnd");
 var FXSignal_1 = require("./util/FXSignal");
+var LinkedList_1 = require("./util/LinkedList");
+var Rnd_1 = require("./util/Rnd");
 var EffectSequence = (function (_super) {
     __extends(EffectSequence, _super);
     function EffectSequence(componentId) {
@@ -130,7 +131,7 @@ var EffectSequence = (function (_super) {
             completed: new FXSignal_1.FXSignal(),
             exhausted: new FXSignal_1.FXSignal(),
             effectSpawned: new FXSignal_1.FXSignal(),
-            triggerActivated: new FXSignal_1.FXSignal()
+            triggerActivated: new FXSignal_1.FXSignal(),
         };
         return _this;
     }
@@ -141,16 +142,18 @@ var EffectSequence = (function (_super) {
         this.container = container;
         this._scaleMod = scaleMod;
         this._delay = delay * 1000;
-        if (autoStart)
+        if (autoStart) {
             this.start();
+        }
         return this;
     };
     EffectSequence.prototype.start = function () {
-        if (this._active)
+        if (this._active) {
             return;
+        }
         this._startTime = Date.now() + (this.settings.delay ? this.settings.delay * 1000 : 0) + this._delay;
         this._index = 0;
-        if (this._list.length == 0) {
+        if (this._list.length === 0) {
             this._active = false;
             if (this.__on.exhausted.__hasCallback) {
                 this.__on.exhausted.dispatch(this);
@@ -172,18 +175,20 @@ var EffectSequence = (function (_super) {
     };
     EffectSequence.prototype.update = function (dt) {
         var t = Date.now();
-        if (t < this._startTime)
+        if (t < this._startTime) {
             return;
+        }
         this._time += dt;
         if (!this.exhausted && t >= this._effectStartTime) {
             var fx = this.__fx;
             var def = this._nextEffectSettings;
             var effect = void 0;
             var node_1;
+            var container = void 0;
             switch (def.componentType) {
                 case FX_1.FX.EffectSequenceComponentType.Sprite:
                     effect = fx.__getSprite(def.componentId);
-                    var container = fx.__containers[def.containerId] || this.container;
+                    container = fx.__containers[def.containerId] || this.container;
                     container.addChild(effect);
                     effect.blendMode = fx.useBlendModes ? def.blendMode : 0;
                     effect.tint = def.tint;
@@ -244,7 +249,7 @@ var EffectSequence = (function (_super) {
                     }
                     break;
             }
-            if (this._index == this._list.length) {
+            if (this._index === this._list.length) {
                 this.exhausted = true;
                 if (this.__on.exhausted.__hasCallback) {
                     this.__on.exhausted.dispatch(this);
@@ -272,7 +277,7 @@ var EffectSequence = (function (_super) {
             }
             node = node.next;
         }
-        if (this.exhausted && list.length == 0) {
+        if (this.exhausted && list.length === 0) {
             this._active = false;
             this.completed = true;
             if (this.__on.completed.__hasCallback) {
@@ -285,8 +290,9 @@ var EffectSequence = (function (_super) {
         this.recycle();
     };
     EffectSequence.prototype.recycle = function () {
-        if (this.__recycled)
+        if (this.__recycled) {
             return;
+        }
         var list = this._elements;
         var node = list.first;
         var next;
@@ -296,16 +302,21 @@ var EffectSequence = (function (_super) {
             node = next;
         }
         var on = this.__on;
-        if (on.completed.__hasCallback)
+        if (on.completed.__hasCallback) {
             on.completed.removeAll();
-        if (on.started.__hasCallback)
+        }
+        if (on.started.__hasCallback) {
             on.started.removeAll();
-        if (on.exhausted.__hasCallback)
+        }
+        if (on.exhausted.__hasCallback) {
             on.exhausted.removeAll();
-        if (on.effectSpawned.__hasCallback)
+        }
+        if (on.effectSpawned.__hasCallback) {
             on.effectSpawned.removeAll();
-        if (on.triggerActivated.__hasCallback)
+        }
+        if (on.triggerActivated.__hasCallback) {
             on.triggerActivated.removeAll();
+        }
         list.clear();
         this.__recycled = true;
         this._x = this._y = this._rotation = 0;
@@ -380,8 +391,9 @@ var EffectSequence = (function (_super) {
         configurable: true
     });
     EffectSequence.prototype.setNextEffect = function () {
-        if (this.exhausted)
+        if (this.exhausted) {
             return;
+        }
         var def = this._nextEffectSettings = this._list[this._index++];
         this._effectStartTime = this._startTime + def.delay * 1000;
     };
@@ -433,16 +445,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var ParticleEmitter_1 = require("./ParticleEmitter");
-var LinkedList_1 = require("./util/LinkedList");
-var RingEmitterCore_1 = require("./core/RingEmitterCore");
-var CircleEmitterCore_1 = require("./core/CircleEmitterCore");
+var pixi_js_1 = require("pixi.js");
 var BoxEmitterCore_1 = require("./core/BoxEmitterCore");
+var CircleEmitterCore_1 = require("./core/CircleEmitterCore");
+var RingEmitterCore_1 = require("./core/RingEmitterCore");
 var EffectSequence_1 = require("./EffectSequence");
-var Sprite_1 = require("./Sprite");
-var Particle_1 = require("./Particle");
 var MovieClip_1 = require("./MovieClip");
+var Particle_1 = require("./Particle");
+var ParticleEmitter_1 = require("./ParticleEmitter");
 var Sanitizer_1 = require("./Sanitizer");
+var Sprite_1 = require("./Sprite");
+var LinkedList_1 = require("./util/LinkedList");
 var ComponentType;
 (function (ComponentType) {
     ComponentType[ComponentType["Sprite"] = 0] = "Sprite";
@@ -477,12 +490,14 @@ var FX = (function () {
         this._active = false;
     };
     FX.prototype.update = function (delta) {
-        if (!this.active)
+        if (!this.active) {
             return;
+        }
         var t = Date.now();
         var dt = (t - this._timeElapsed) * 0.001;
-        if (delta !== undefined)
+        if (delta !== undefined) {
             dt *= delta;
+        }
         var list = this._effects;
         var node = list.first;
         var next;
@@ -500,22 +515,23 @@ var FX = (function () {
             sprites: [],
             effectSequences: [],
             emitters: [],
-            cores: {}
+            cores: {},
         };
         this._settingsCache = {
             mcs: {},
             sprites: {},
             emitters: {},
-            effectSequences: {}
+            effectSequences: {},
         };
         this._nameMaps = {
             emitters: {},
-            effectSequences: {}
+            effectSequences: {},
         };
     };
     FX.prototype.setFloorY = function (value) {
         var s = this._settingsCache.emitters;
-        for (var n in s) {
+        for (var _i = 0, _a = Object.keys(s); _i < _a.length; _i++) {
+            var n = _a[_i];
             s[n].floorY = value;
         }
     };
@@ -531,19 +547,19 @@ var FX = (function () {
     };
     FX.prototype.loadBundleFiles = function (bundleSettingsUrl, spritesheetUrl, spritesheetFilter, additionalAssets) {
         var _this = this;
-        if (spritesheetFilter === void 0) { spritesheetFilter = ''; }
+        if (spritesheetFilter === void 0) { spritesheetFilter = ""; }
         return new Promise(function (resolve, reject) {
-            var loader = new PIXI.Loader();
+            var loader = new pixi_js_1.Loader();
             loader.onError.add(function (err) {
                 reject(err);
             });
             loader
-                .add('rfx_spritesheet', spritesheetUrl)
-                .add('rfx_bundleSettings', bundleSettingsUrl);
+                .add("rfx_spritesheet", spritesheetUrl)
+                .add("rfx_bundleSettings", bundleSettingsUrl);
             if (additionalAssets) {
                 for (var _i = 0, additionalAssets_1 = additionalAssets; _i < additionalAssets_1.length; _i++) {
                     var arg = additionalAssets_1[_i];
-                    if (arg.hasOwnProperty('name') && arg.hasOwnProperty('url')) {
+                    if (arg.hasOwnProperty("name") && arg.hasOwnProperty("url")) {
                         loader.add(arg.name, arg.url);
                     }
                     else {
@@ -560,15 +576,15 @@ var FX = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             if (jszipInstance == null) {
-                reject('JSZip instance not provided.');
+                reject("JSZip instance not provided.");
                 return;
             }
-            var loader = new PIXI.Loader();
-            loader.add('zip', zipUrl, { xhrType: PIXI.LoaderResource.XHR_RESPONSE_TYPE.BLOB });
+            var loader = new pixi_js_1.Loader();
+            loader.add("zip", zipUrl, { xhrType: pixi_js_1.LoaderResource.XHR_RESPONSE_TYPE.BLOB });
             if (additionalAssets) {
                 for (var _i = 0, additionalAssets_2 = additionalAssets; _i < additionalAssets_2.length; _i++) {
                     var arg = additionalAssets_2[_i];
-                    if (arg.hasOwnProperty('name') && arg.hasOwnProperty('url')) {
+                    if (arg.hasOwnProperty("name") && arg.hasOwnProperty("url")) {
                         loader.add(arg.name, arg.url);
                     }
                     else {
@@ -577,45 +593,41 @@ var FX = (function () {
                 }
             }
             loader.load(function (l, d) { return __awaiter(_this, void 0, void 0, function () {
-                var spritesheetImageData, spritesheetDef, settingsDef_1, list_1, _a, _b, _i, n, entry, base64, s, def, texture, spritesheet, err_1;
+                var spritesheetImageData, spritesheetDef, settingsDef_1, list_2, _i, list_1, entry, base64, s, def, texture, spritesheet, err_1;
                 var _this = this;
-                return __generator(this, function (_c) {
-                    switch (_c.label) {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
-                            _c.trys.push([0, 8, , 9]);
+                            _a.trys.push([0, 8, , 9]);
                             spritesheetImageData = void 0;
                             spritesheetDef = void 0;
                             return [4, jszipInstance.loadAsync(d.zip.data)];
                         case 1:
-                            _c.sent();
-                            list_1 = [];
+                            _a.sent();
+                            list_2 = [];
                             jszipInstance.forEach(function (path, entry) {
-                                list_1.push(entry);
+                                list_2.push(entry);
                             });
-                            _a = [];
-                            for (_b in list_1)
-                                _a.push(_b);
-                            _i = 0;
-                            _c.label = 2;
+                            _i = 0, list_1 = list_2;
+                            _a.label = 2;
                         case 2:
-                            if (!(_i < _a.length)) return [3, 7];
-                            n = _a[_i];
-                            entry = list_1[n];
-                            if (!(entry.name.indexOf('.png') != -1)) return [3, 4];
-                            return [4, entry.async('base64')];
+                            if (!(_i < list_1.length)) return [3, 7];
+                            entry = list_1[_i];
+                            if (!(entry.name.indexOf(".png") !== -1)) return [3, 4];
+                            return [4, entry.async("base64")];
                         case 3:
-                            base64 = _c.sent();
+                            base64 = _a.sent();
                             spritesheetImageData = "data:image/png;base64," + base64;
                             return [3, 6];
                         case 4:
-                            if (!(entry.name.indexOf('.json') != -1)) return [3, 6];
-                            return [4, entry.async('string')];
+                            if (!(entry.name.indexOf(".json") !== -1)) return [3, 6];
+                            return [4, entry.async("string")];
                         case 5:
-                            s = _c.sent();
+                            s = _a.sent();
                             def = JSON.parse(s);
                             if (def.__h) {
                                 if (def.__h !== FX._bundleHash) {
-                                    reject('Invalid settings file.');
+                                    reject("Invalid settings file.");
                                     return [2];
                                 }
                                 settingsDef_1 = def;
@@ -623,13 +635,13 @@ var FX = (function () {
                             else if (def.frames) {
                                 spritesheetDef = def;
                             }
-                            _c.label = 6;
+                            _a.label = 6;
                         case 6:
                             _i++;
                             return [3, 2];
                         case 7:
-                            texture = PIXI.Texture.from(spritesheetImageData);
-                            spritesheet = new PIXI.Spritesheet(texture.baseTexture, spritesheetDef);
+                            texture = pixi_js_1.Texture.from(spritesheetImageData);
+                            spritesheet = new pixi_js_1.Spritesheet(texture.baseTexture, spritesheetDef);
                             spritesheet.parse(function () {
                                 setTimeout(function () {
                                     resolve(_this.initBundle(settingsDef_1, true));
@@ -637,7 +649,7 @@ var FX = (function () {
                             });
                             return [3, 9];
                         case 8:
-                            err_1 = _c.sent();
+                            err_1 = _a.sent();
                             reject(err_1.toString());
                             return [3, 9];
                         case 9: return [2];
@@ -648,21 +660,21 @@ var FX = (function () {
     };
     FX.prototype.initBundle = function (bundleSettings, clearCache) {
         if (bundleSettings.__h !== FX._bundleHash) {
-            throw new Error('Invalid settings file.');
+            throw new Error("Invalid settings file.");
         }
-        if (bundleSettings.__v != FX.settingsVersion) {
-            throw new Error('Settings version mismatch.');
+        if (bundleSettings.__v !== FX.settingsVersion) {
+            throw new Error("Settings version mismatch.");
         }
         Sanitizer_1.Sanitizer.sanitizeBundle(bundleSettings);
         if (clearCache) {
             this.clearCache();
         }
-        for (var n in bundleSettings.emitters) {
-            var preset = bundleSettings.emitters[n];
+        for (var _i = 0, _a = bundleSettings.emitters; _i < _a.length; _i++) {
+            var preset = _a[_i];
             this.addParticleEmitter(preset.id, preset);
         }
-        for (var n in bundleSettings.sequences) {
-            var preset = bundleSettings.sequences[n];
+        for (var _b = 0, _c = bundleSettings.sequences; _b < _c.length; _b++) {
+            var preset = _c[_b];
             this.addEffectSequence(preset.id, preset);
         }
         this.useBlendModes = bundleSettings.useBlendModes;
@@ -670,28 +682,32 @@ var FX = (function () {
         return this.parseTextureCache(bundleSettings.spritesheetFilter);
     };
     FX.prototype.addParticleEmitter = function (componentId, settings) {
-        if (this._settingsCache.emitters[componentId])
+        if (this._settingsCache.emitters[componentId]) {
             throw new Error("ComponentId '" + componentId + "' already exists.");
+        }
         this._settingsCache.emitters[componentId] = settings;
         this._nameMaps.emitters[settings.name] = settings;
         return this;
     };
     FX.prototype.addEffectSequence = function (componentId, settings) {
-        if (this._settingsCache.effectSequences[componentId])
+        if (this._settingsCache.effectSequences[componentId]) {
             throw new Error("ComponentId '" + componentId + "' already exists.");
+        }
         this._settingsCache.effectSequences[componentId] = settings;
         this._nameMaps.effectSequences[settings.name] = settings;
         return this;
     };
     FX.prototype.initSprite = function (componentId, settings) {
-        if (this._settingsCache.sprites[componentId])
+        if (this._settingsCache.sprites[componentId]) {
             throw new Error("ComponentId '" + componentId + "' already exists.");
+        }
         this._settingsCache.sprites[componentId] = settings;
         return this;
     };
     FX.prototype.initMovieClip = function (componentId, settings) {
-        if (this._settingsCache.mcs[componentId])
+        if (this._settingsCache.mcs[componentId]) {
             throw new Error("ComponentId '" + componentId + "' already exists.");
+        }
         this._settingsCache.mcs[componentId] = settings;
         return this;
     };
@@ -706,17 +722,19 @@ var FX = (function () {
     };
     FX.prototype.getEffectSequence = function (name) {
         var settings = this._nameMaps.effectSequences[name];
-        if (!settings)
+        if (!settings) {
             throw new Error("Settings not defined for '" + name + "'");
+        }
         return this.getEffectSequenceById(settings.id);
     };
     FX.prototype.getEffectSequenceById = function (componentId) {
         var pool = this._cache.effectSequences;
         var effectSequence;
         var settings = this._settingsCache.effectSequences[componentId];
-        if (!settings)
+        if (!settings) {
             throw new Error("Settings not defined for '" + componentId + "'");
-        if (pool.length == 0) {
+        }
+        if (pool.length === 0) {
             effectSequence = new EffectSequence_1.EffectSequence(componentId);
             effectSequence.__fx = this;
         }
@@ -730,8 +748,9 @@ var FX = (function () {
         if (autoRecycleOnComplete === void 0) { autoRecycleOnComplete = true; }
         if (cloneSettings === void 0) { cloneSettings = false; }
         var settings = this._nameMaps.emitters[name];
-        if (!settings)
+        if (!settings) {
             throw new Error("Settings not defined for '" + name + "'");
+        }
         return this.getParticleEmitterById(settings.id, autoRecycleOnComplete, cloneSettings);
     };
     FX.prototype.getParticleEmitterById = function (componentId, autoRecycleOnComplete, cloneSettings) {
@@ -740,9 +759,10 @@ var FX = (function () {
         var pool = this._cache.emitters;
         var emitter;
         var settings = this._settingsCache.emitters[componentId];
-        if (!settings)
+        if (!settings) {
             throw new Error("Settings not defined for '" + componentId + "'");
-        if (pool.length == 0) {
+        }
+        if (pool.length === 0) {
             emitter = new ParticleEmitter_1.ParticleEmitter(componentId);
             emitter.__fx = this;
         }
@@ -770,8 +790,8 @@ var FX = (function () {
     };
     FX.prototype.stopAllEffects = function () {
         var list = this._effects.toArray();
-        for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
-            var node = list_2[_i];
+        for (var _i = 0, list_3 = list; _i < list_3.length; _i++) {
+            var node = list_3[_i];
             node.recycle();
         }
     };
@@ -779,7 +799,7 @@ var FX = (function () {
         return this.parseObject(spriteSheet.data.frames, filter);
     };
     FX.prototype.parseTextureCache = function (filter) {
-        return this.parseObject(PIXI.utils.TextureCache, filter);
+        return this.parseObject(pixi_js_1.utils.TextureCache, filter);
     };
     Object.defineProperty(FX.prototype, "active", {
         get: function () {
@@ -800,10 +820,11 @@ var FX = (function () {
         if (cache[componentId] == null) {
             pool = cache[componentId] = [];
         }
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             var settings = this._settingsCache.sprites[componentId];
-            if (settings == null)
+            if (settings == null) {
                 throw new Error("Settings not defined for '" + componentId + "'");
+            }
             var sprite = new Sprite_1.Sprite(componentId, settings.texture, settings.anchorX, settings.anchorY);
             sprite.__fx = this;
             return sprite;
@@ -816,10 +837,11 @@ var FX = (function () {
         if (cache[componentId] == null) {
             pool = cache[componentId] = [];
         }
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             var settings = this._settingsCache.mcs[componentId];
-            if (settings == null)
+            if (settings == null) {
                 throw new Error("Settings not defined for '" + componentId + "'");
+            }
             var mc = new MovieClip_1.MovieClip(componentId, settings.textures, settings.anchorX, settings.anchorY);
             mc.__fx = this;
             return mc;
@@ -827,8 +849,9 @@ var FX = (function () {
         return pool.pop();
     };
     FX.prototype.__getParticle = function () {
-        var cache = this._cache, pool = cache.particles;
-        if (pool.length == 0) {
+        var cache = this._cache;
+        var pool = cache.particles;
+        if (pool.length === 0) {
             var particle = new Particle_1.Particle();
             particle.__fx = this;
             return particle;
@@ -841,7 +864,7 @@ var FX = (function () {
         if (pool == null) {
             pool = cache[type] = [];
         }
-        if (pool.length == 0) {
+        if (pool.length === 0) {
             return new FX.__emitterCores[type](type);
         }
         return pool.pop();
@@ -871,21 +894,24 @@ var FX = (function () {
         var frames = object;
         var mcs = {};
         var result = { sprites: [], movieClips: [] };
-        for (var i in frames) {
-            if (filter && i.indexOf(filter) == -1) {
+        for (var _i = 0, _a = Object.keys(frames); _i < _a.length; _i++) {
+            var i = _a[_i];
+            if (filter && i.indexOf(filter) === -1) {
                 continue;
             }
             this.initSprite(i, { texture: i, anchorX: 0.5, anchorY: 0.5 });
             result.sprites.push(i);
-            if (i.substr(0, 3) == 'mc_') {
-                var parts = i.split('_');
+            if (i.substr(0, 3) === "mc_") {
+                var parts = i.split("_");
                 var group = parts[1];
-                if (mcs[group] == null)
+                if (mcs[group] == null) {
                     mcs[group] = [];
+                }
                 mcs[group].push(i);
             }
         }
-        for (var i in mcs) {
+        for (var _b = 0, _c = Object.keys(mcs); _b < _c.length; _b++) {
+            var i = _c[_b];
             var textures = mcs[i];
             result.movieClips.push(i);
             this.initMovieClip(i, { textures: textures, anchorX: 0.5, anchorY: 0.5 });
@@ -893,19 +919,18 @@ var FX = (function () {
         return result;
     };
     FX.settingsVersion = 0;
-    FX._bundleHash = '80c6df7fb0d3d898f34ce0031c037fef';
-    FX.ComponentType = ComponentType;
+    FX._bundleHash = "80c6df7fb0d3d898f34ce0031c037fef";
     FX.EffectSequenceComponentType = EffectSequenceComponentType;
     FX.__emitterCores = {
         circle: CircleEmitterCore_1.CircleEmitterCore,
         box: BoxEmitterCore_1.BoxEmitterCore,
-        ring: RingEmitterCore_1.RingEmitterCore
+        ring: RingEmitterCore_1.RingEmitterCore,
     };
     return FX;
 }());
 exports.FX = FX;
 
-},{"./EffectSequence":2,"./MovieClip":4,"./Particle":5,"./ParticleEmitter":6,"./Sanitizer":7,"./Sprite":8,"./core/BoxEmitterCore":10,"./core/CircleEmitterCore":11,"./core/RingEmitterCore":12,"./util/LinkedList":17}],4:[function(require,module,exports){
+},{"./EffectSequence":2,"./MovieClip":4,"./Particle":5,"./ParticleEmitter":6,"./Sanitizer":7,"./Sprite":8,"./core/BoxEmitterCore":10,"./core/CircleEmitterCore":11,"./core/RingEmitterCore":12,"./util/LinkedList":17,"pixi.js":undefined}],4:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -921,6 +946,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var pixi_js_1 = require("pixi.js");
 var MovieClip = (function (_super) {
     __extends(MovieClip, _super);
     function MovieClip(componentId, textures, anchorX, anchorY) {
@@ -928,7 +954,7 @@ var MovieClip = (function (_super) {
         var t = [];
         var l = textures.length;
         for (var i = 0; i < l; i++) {
-            t.push(PIXI.Texture.from(textures[i]));
+            t.push(pixi_js_1.Texture.from(textures[i]));
         }
         _this = _super.call(this, t) || this;
         _this.componentId = componentId;
@@ -942,23 +968,25 @@ var MovieClip = (function (_super) {
         this.tint = 0xffffff;
         this.transform.rotation = 0;
         this.transform.scale.set(1);
-        if (this.parent)
+        if (this.parent) {
             this.parent.removeChild(this);
+        }
         this.gotoAndStop(0);
         this.__fx.__recycleMovieClip(this.componentId, this);
     };
     MovieClip.prototype.dispose = function () {
-        if (this.parent)
+        if (this.parent) {
             this.parent.removeChild(this);
+        }
         this.__fx = null;
         this.gotoAndStop(0);
         this.destroy();
     };
     return MovieClip;
-}(PIXI.AnimatedSprite));
+}(pixi_js_1.AnimatedSprite));
 exports.MovieClip = MovieClip;
 
-},{}],5:[function(require,module,exports){
+},{"pixi.js":undefined}],5:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -974,11 +1002,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var LinkedList_1 = require("./util/LinkedList");
 var Color_1 = require("./util/Color");
 var Easing_1 = require("./util/Easing");
-var Rnd_1 = require("./util/Rnd");
 var FXSignal_1 = require("./util/FXSignal");
+var LinkedList_1 = require("./util/LinkedList");
+var Rnd_1 = require("./util/Rnd");
 var Particle = (function (_super) {
     __extends(Particle, _super);
     function Particle() {
@@ -992,7 +1020,7 @@ var Particle = (function (_super) {
         _this.__on = {
             died: new FXSignal_1.FXSignal(),
             bounced: new FXSignal_1.FXSignal(),
-            updated: new FXSignal_1.FXSignal()
+            updated: new FXSignal_1.FXSignal(),
         };
         _this._color = new Color_1.Color();
         return _this;
@@ -1060,7 +1088,7 @@ var Particle = (function (_super) {
             if (settings.fadeIn) {
                 this.alphaDuration = duration * (1 - settings.fadeInDurationFac);
                 this.fadeInDuration = duration * settings.fadeInDurationFac;
-                this.fadeInEase = Easing_1.Easing[settings.fadeInEase || 'easeInSine'];
+                this.fadeInEase = Easing_1.Easing[settings.fadeInEase || "easeInSine"];
             }
         }
         if (settings.useScale) {
@@ -1084,7 +1112,7 @@ var Particle = (function (_super) {
                 if (settings.scaleIn) {
                     this.scaleDuration = duration * (1 - settings.scaleInDurationFac);
                     this.scaleInDuration = duration * settings.scaleInDurationFac;
-                    this.scaleInEase = Easing_1.Easing[settings.scaleInEase || 'easeInSine'];
+                    this.scaleInEase = Easing_1.Easing[settings.scaleInEase || "easeInSine"];
                 }
             }
             else {
@@ -1100,8 +1128,9 @@ var Particle = (function (_super) {
         }
         if (settings.useRotation) {
             this.rotationSpeed = Rnd_1.Rnd.float(settings.rotationSpeedMin, settings.rotationSpeedMax) * scaleMod;
-            if (settings.randomRotationDirection)
+            if (settings.randomRotationDirection) {
                 this.rotationSpeed *= Rnd_1.Rnd.sign();
+            }
         }
         if (settings.useTint) {
             this.tintEase = Easing_1.Easing[settings.tintEase];
@@ -1187,22 +1216,13 @@ var Particle = (function (_super) {
             }
         }
         if (this.useAlpha) {
-            if (this.useFadeIn) {
-                if (t < this.fadeInDuration) {
-                    component.alpha = this.fadeInEase(t, 0, this.alphaStart, this.fadeInDuration);
-                }
-                else {
-                    component.alpha = this.alphaEase(t - this.fadeInDuration, this.alphaStart, this.alphaDelta, this.alphaDuration);
-                }
-            }
-            else {
-                if (this.alphaEase) {
-                    component.alpha = this.alphaEase(t, this.alphaStart, this.alphaDelta, duration);
-                }
-                else {
-                    component.alpha = (this.alphaDelta) * mod + this.alphaStart;
-                }
-            }
+            component.alpha = this.useFadeIn
+                ? t < this.fadeInDuration
+                    ? this.fadeInEase(t, 0, this.alphaStart, this.fadeInDuration)
+                    : this.alphaEase(t - this.fadeInDuration, this.alphaStart, this.alphaDelta, this.alphaDuration)
+                : this.alphaEase
+                    ? this.alphaEase(t, this.alphaStart, this.alphaDelta, duration)
+                    : (this.alphaDelta) * mod + this.alphaStart;
         }
         if (this.useRotation) {
             transform.rotation += this.rotationSpeed;
@@ -1210,12 +1230,9 @@ var Particle = (function (_super) {
         if (this.useScale) {
             if (this.uniformScale) {
                 if (this.useScaleIn) {
-                    if (t < this.scaleInDuration) {
-                        transform.scale.x = transform.scale.y = this.scaleInEase(t, 0, this.scaleStart, this.scaleInDuration);
-                    }
-                    else {
-                        transform.scale.x = transform.scale.y = this.scaleEase(t - this.scaleInDuration, this.scaleStart, this.scaleDelta, this.scaleDuration);
-                    }
+                    transform.scale.x = t < this.scaleInDuration
+                        ? (transform.scale.y = this.scaleInEase(t, 0, this.scaleStart, this.scaleInDuration))
+                        : (transform.scale.y = this.scaleEase(t - this.scaleInDuration, this.scaleStart, this.scaleDelta, this.scaleDuration));
                 }
                 else {
                     if (this.scaleEase) {
@@ -1239,18 +1256,12 @@ var Particle = (function (_super) {
                     }
                 }
                 else {
-                    if (this.scaleXEase) {
-                        transform.scale.x = this.scaleXEase(t, this.scaleXStart, this.scaleXDelta, duration);
-                    }
-                    else {
-                        transform.scale.x = this.scaleXDelta * mod + this.scaleXStart;
-                    }
-                    if (this.scaleYEase) {
-                        transform.scale.y = this.scaleYEase(t, this.scaleYStart, this.scaleYDelta, duration);
-                    }
-                    else {
-                        transform.scale.y = this.scaleYDelta * mod + this.scaleYStart;
-                    }
+                    transform.scale.x = this.scaleXEase
+                        ? this.scaleXEase(t, this.scaleXStart, this.scaleXDelta, duration)
+                        : this.scaleXDelta * mod + this.scaleXStart;
+                    transform.scale.y = this.scaleYEase
+                        ? this.scaleYEase(t, this.scaleYStart, this.scaleYDelta, duration)
+                        : this.scaleYDelta * mod + this.scaleYStart;
                 }
             }
         }
@@ -1268,8 +1279,9 @@ var Particle = (function (_super) {
             var l = childs.length;
             while (--l > -1) {
                 var child = childs[l];
-                if (child.__recycled)
+                if (child.__recycled) {
                     continue;
+                }
                 child.x = component.position.x;
                 child.y = transform.position.y;
                 if (child.__adoptRotation) {
@@ -1348,8 +1360,9 @@ var Particle = (function (_super) {
         var index = this._childEmitters.indexOf(emitter);
         if (index > -1) {
             this._childEmitters.splice(index, 1);
-            if (this._childEmitters.length == 0)
+            if (this._childEmitters.length === 0) {
                 this._hasChildEmitters = false;
+            }
         }
     };
     return Particle;
@@ -1373,9 +1386,9 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var BaseEffect_1 = require("./BaseEffect");
+var FXSignal_1 = require("./util/FXSignal");
 var LinkedList_1 = require("./util/LinkedList");
 var Rnd_1 = require("./util/Rnd");
-var FXSignal_1 = require("./util/FXSignal");
 var ParticleEmitter = (function (_super) {
     __extends(ParticleEmitter, _super);
     function ParticleEmitter(componentId) {
@@ -1395,7 +1408,7 @@ var ParticleEmitter = (function (_super) {
             particleUpdated: new FXSignal_1.FXSignal(),
             particleSpawned: new FXSignal_1.FXSignal(),
             particleBounced: new FXSignal_1.FXSignal(),
-            particleDied: new FXSignal_1.FXSignal()
+            particleDied: new FXSignal_1.FXSignal(),
         };
         return _this;
     }
@@ -1404,25 +1417,22 @@ var ParticleEmitter = (function (_super) {
         if (scaleMod === void 0) { scaleMod = 1; }
         this.container = container;
         this.core.__scaleMod = this._scaleMod = scaleMod;
-        if (autoStart)
+        if (autoStart) {
             this.start();
+        }
         return this;
     };
     ParticleEmitter.prototype.start = function () {
-        if (this._active)
+        if (this._active) {
             return;
+        }
         var t = Date.now();
         var s = this.settings;
         var RX = this.__fx;
         RX.emitterCount++;
         this.infinite = s.infinite;
         this._time = Number.MAX_VALUE;
-        if (s.duration > 0) {
-            this.endTime = t + s.duration * 1000;
-        }
-        else {
-            this.endTime = s.duration;
-        }
+        this.endTime = s.duration > 0 ? t + s.duration * 1000 : s.duration;
         this._nextSpawnTime = 0;
         this._particleCount = 0;
         this._active = true;
@@ -1474,8 +1484,9 @@ var ParticleEmitter = (function (_super) {
         }
     };
     ParticleEmitter.prototype.update = function (dt) {
-        if (!this._active)
+        if (!this._active) {
             return;
+        }
         var t = Date.now();
         if (!this.exhausted) {
             if (this.settings.autoRotation !== 0) {
@@ -1483,7 +1494,7 @@ var ParticleEmitter = (function (_super) {
             }
             if (this.target) {
                 this.rotation = this.target.rotation;
-                if (this.targetOffset == 0) {
+                if (this.targetOffset === 0) {
                     this.x = this.target.x;
                     this.y = this.target.y;
                 }
@@ -1492,7 +1503,7 @@ var ParticleEmitter = (function (_super) {
                     this.y = this.target.y + Math.sin(this._rotation) * this.targetOffset;
                 }
             }
-            if (this.endTime == 0 && !this.infinite) {
+            if (this.endTime === 0 && !this.infinite) {
                 this.spawn();
                 this.exhausted = true;
             }
@@ -1512,15 +1523,16 @@ var ParticleEmitter = (function (_super) {
             }
         }
         else {
-            if (this._particleCount == 0) {
+            if (this._particleCount === 0) {
                 this._active = false;
                 this.completed = true;
                 if (this.__on.completed.__hasCallback) {
                     this.__on.completed.dispatch(this);
                 }
                 this.__fx.__removeActiveEffect(this);
-                if (this.autoRecycleOnComplete)
+                if (this.autoRecycleOnComplete) {
                     this.recycle();
+                }
             }
         }
         var list = this._particles;
@@ -1534,15 +1546,17 @@ var ParticleEmitter = (function (_super) {
         return this;
     };
     ParticleEmitter.prototype.spawn = function () {
-        if (this._paused)
+        if (this._paused) {
             return;
+        }
         var s = this.settings;
         var fx = this.__fx;
         var n = Rnd_1.Rnd.integer(s.spawnCountMin, s.spawnCountMax) * fx.particleFac;
         this.core.prepare(n);
         while (--n > -1) {
-            if (this._particleCount >= s.maxParticles || fx.particleCount >= fx.maxParticles)
+            if (this._particleCount >= s.maxParticles || fx.particleCount >= fx.maxParticles) {
                 return;
+            }
             var ps = s.particleSettings;
             var p = fx.__getParticle();
             var component = void 0;
@@ -1555,7 +1569,7 @@ var ParticleEmitter = (function (_super) {
                     p.componentId = ps.componentId;
                     component = fx.__getMovieClip(p.componentId);
                     if (ps.componentParams) {
-                        component.loop = ps.componentParams.loop == null || !ps.componentParams.loop ? false : true;
+                        component.loop = ps.componentParams.loop;
                         component.animationSpeed = Rnd_1.Rnd.float(ps.componentParams.animationSpeedMin || 1, ps.componentParams.animationSpeedMax || 1);
                     }
                     component.gotoAndPlay(0);
@@ -1574,8 +1588,9 @@ var ParticleEmitter = (function (_super) {
         return this;
     };
     ParticleEmitter.prototype.recycle = function () {
-        if (this.__recycled)
+        if (this.__recycled) {
             return;
+        }
         if (this.__parent) {
             this.__parent.__removeChildEmitter(this);
             this.__parent = null;
@@ -1599,20 +1614,27 @@ var ParticleEmitter = (function (_super) {
         this.target = null;
         this.name = null;
         var on = this.__on;
-        if (on.completed.__hasCallback)
+        if (on.completed.__hasCallback) {
             on.completed.removeAll();
-        if (on.started.__hasCallback)
+        }
+        if (on.started.__hasCallback) {
             on.started.removeAll();
-        if (on.exhausted.__hasCallback)
+        }
+        if (on.exhausted.__hasCallback) {
             on.exhausted.removeAll();
-        if (on.particleBounced.__hasCallback)
+        }
+        if (on.particleBounced.__hasCallback) {
             on.particleBounced.removeAll();
-        if (on.particleDied.__hasCallback)
+        }
+        if (on.particleDied.__hasCallback) {
             on.particleDied.removeAll();
-        if (on.particleSpawned.__hasCallback)
+        }
+        if (on.particleSpawned.__hasCallback) {
             on.particleSpawned.removeAll();
-        if (on.particleUpdated.__hasCallback)
+        }
+        if (on.particleUpdated.__hasCallback) {
             on.particleUpdated.removeAll();
+        }
     };
     ParticleEmitter.prototype.dispose = function () {
         var list = this._particles;
@@ -1770,8 +1792,9 @@ var ParticleEmitter = (function (_super) {
         var index = this._childEmitters.indexOf(emitter);
         if (index > -1) {
             this._childEmitters.splice(index, 1);
-            if (this._childEmitters.length == 0)
+            if (this._childEmitters.length === 0) {
                 this._hasChildEmitters = false;
+            }
         }
     };
     ParticleEmitter.prototype.__subSpawn = function (particle, list) {
@@ -1855,10 +1878,11 @@ var Sanitizer = (function () {
             }
             else {
                 var bundleProp = bundleObject[propName];
-                if (typeof bundleProp !== 'object')
+                if (typeof bundleProp !== "object") {
                     continue;
+                }
                 var structureProp = structureObject[propName];
-                if (!bundleProp.hasOwnProperty('length')) {
+                if (!bundleProp.hasOwnProperty("length")) {
                     Sanitizer.parse(bundleProp, structureProp, spawnStructureObject);
                 }
                 else {
@@ -1877,12 +1901,12 @@ var Sanitizer = (function () {
     Sanitizer._presetStructure = {
         sequence: {
             id: 0,
-            name: '',
+            name: "",
             type: 1,
             delay: 0,
             scaleMin: 1,
             scaleMax: 1,
-            effects: []
+            effects: [],
         },
         sequenceEffect: {
             id: 0,
@@ -1894,7 +1918,7 @@ var Sanitizer = (function () {
                 animationSpeedMax: 1,
                 anchorX: 0.5,
                 anchorY: 0.5,
-                loop: false
+                loop: false,
             },
             scaleMin: 1,
             scaleMax: 1,
@@ -1905,23 +1929,23 @@ var Sanitizer = (function () {
             blendMode: 0,
             duration: 0.1,
             tint: 0xffffff,
-            containerId: '',
-            triggerValue: ''
+            containerId: "",
+            triggerValue: "",
         },
         emitter: {
             id: 0,
-            name: '',
+            name: "",
             type: 0,
             core: {
-                type: 'circle',
+                type: "circle",
                 params: {
                     radius: 100,
                     radial: true,
                     angle: 6.28318530718,
                     uniform: false,
                     width: 100,
-                    height: 100
-                }
+                    height: 100,
+                },
             },
             spawnFrequencyMin: 0.1,
             spawnFrequencyMax: 0.1,
@@ -1938,19 +1962,19 @@ var Sanitizer = (function () {
             autoRotation: 0,
             particleSettings: {
                 componentType: 0,
-                componentId: '',
+                componentId: "",
                 componentParams: {
                     animationSpeedMin: 1,
                     animationSpeedMax: 1,
                     anchorX: 0.5,
                     anchorY: 0.5,
-                    loop: false
+                    loop: false,
                 },
                 durationMin: 1,
                 durationMax: 2,
                 distanceMin: 0,
                 distanceMax: 0,
-                distanceEase: 'linear',
+                distanceEase: "linear",
                 moveSpeedMin: 0,
                 moveSpeedMax: 0,
                 bounceFacMin: 0,
@@ -1974,51 +1998,51 @@ var Sanitizer = (function () {
                 randomStartRotation: false,
                 fadeIn: true,
                 fadeInDurationFac: 0.1,
-                fadeInEase: 'linear',
+                fadeInEase: "linear",
                 alphaStartMin: 0.7,
                 alphaStartMax: 0.9,
                 alphaEndMin: 0.7,
                 alphaEndMax: 0.8,
-                alphaEase: 'linear',
+                alphaEase: "linear",
                 tintStart: 0xffffff,
                 tintEnd: 0xffffff,
-                tintEase: 'linear',
+                tintEase: "linear",
                 scaleIn: false,
                 scaleInDurationFac: 0.2,
-                scaleInEase: 'linear',
+                scaleInEase: "linear",
                 uniformScale: true,
                 scaleXStartMin: 1,
                 scaleXStartMax: 1,
                 scaleXEndMin: 1,
                 scaleXEndMax: 1,
-                scaleXEase: 'linear',
+                scaleXEase: "linear",
                 scaleYStartMin: 1,
                 scaleYStartMax: 1,
                 scaleYEndMin: 1,
                 scaleYEndMax: 1,
-                scaleYEase: 'linear',
+                scaleYEase: "linear",
                 scaleStartMin: 1,
                 scaleStartMax: 1,
                 scaleEndMin: 1,
                 scaleEndMax: 1,
-                scaleEase: 'linear',
+                scaleEase: "linear",
                 childs: [],
                 spawn: {
                     onComplete: [],
                     onBounce: [],
                     onHalfway: [],
-                    onStart: []
-                }
+                    onStart: [],
+                },
             },
-            childs: []
+            childs: [],
         },
         emitterSpawn: {
             type: 0,
             id: 0,
             scale: 1,
             adoptRotation: true,
-            containerId: ''
-        }
+            containerId: "",
+        },
     };
     return Sanitizer;
 }());
@@ -2040,10 +2064,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var pixi_js_1 = require("pixi.js");
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(componentId, texture, anchorX, anchorY) {
-        var _this = _super.call(this, PIXI.Texture.from(texture)) || this;
+        var _this = _super.call(this, pixi_js_1.Texture.from(texture)) || this;
         _this.componentId = componentId;
         _this.anchor.set(anchorX || 0.5, anchorY || 0.5);
         _this.__sequenceEndTime = null;
@@ -2054,8 +2079,9 @@ var Sprite = (function (_super) {
         this.alpha = 1;
         this.transform.rotation = 0;
         this.transform.scale.set(1);
-        if (this.parent)
+        if (this.parent) {
             this.parent.removeChild(this);
+        }
         this.__fx.__recycleSprite(this.componentId, this);
     };
     Sprite.prototype.dispose = function () {
@@ -2064,10 +2090,10 @@ var Sprite = (function (_super) {
         this.destroy();
     };
     return Sprite;
-}(PIXI.Sprite));
+}(pixi_js_1.Sprite));
 exports.Sprite = Sprite;
 
-},{}],9:[function(require,module,exports){
+},{"pixi.js":undefined}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var BaseEmitterCore = (function () {
@@ -2115,9 +2141,9 @@ var BaseEmitterCore = (function () {
         enumerable: true,
         configurable: true
     });
-    BaseEmitterCore.__TYPE_BOX = 'box';
-    BaseEmitterCore.__TYPE_CIRCLE = 'circle';
-    BaseEmitterCore.__TYPE_RING = 'ring';
+    BaseEmitterCore.__TYPE_BOX = "box";
+    BaseEmitterCore.__TYPE_CIRCLE = "circle";
+    BaseEmitterCore.__TYPE_RING = "ring";
     return BaseEmitterCore;
 }());
 exports.BaseEmitterCore = BaseEmitterCore;
@@ -2138,8 +2164,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseEmitterCore_1 = require("./BaseEmitterCore");
 var Rnd_1 = require("../util/Rnd");
+var BaseEmitterCore_1 = require("./BaseEmitterCore");
 var BoxEmitterCore = (function (_super) {
     __extends(BoxEmitterCore, _super);
     function BoxEmitterCore() {
@@ -2153,7 +2179,7 @@ var BoxEmitterCore = (function (_super) {
         var angle = emitter.rotation;
         var x = Rnd_1.Rnd.float(-w2, w2);
         var y = Rnd_1.Rnd.float(-h2, h2);
-        if (angle != 0) {
+        if (angle !== 0) {
             particle.component.transform.position.x = (this.__x + this._t * (this.x - this.__x)) + x * Math.cos(angle) - y * Math.sin(angle);
             particle.component.transform.position.y = (this.__y + this._t * (this.y - this.__y)) + x * Math.sin(angle) + y * Math.cos(angle);
         }
@@ -2193,8 +2219,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var BaseEmitterCore_1 = require("./BaseEmitterCore");
 var Rnd_1 = require("../util/Rnd");
+var BaseEmitterCore_1 = require("./BaseEmitterCore");
 var CircleEmitterCore = (function (_super) {
     __extends(CircleEmitterCore, _super);
     function CircleEmitterCore() {
@@ -2204,12 +2230,9 @@ var CircleEmitterCore = (function (_super) {
         var settings = this._settings;
         var emitter = this.emitter;
         var angle;
-        if (!settings.angle) {
-            angle = Rnd_1.Rnd.float(0, 6.28319) + emitter.rotation;
-        }
-        else {
-            angle = Rnd_1.Rnd.float(-settings.angle * 0.5, settings.angle * 0.5) + emitter.rotation;
-        }
+        angle = settings.angle
+            ? Rnd_1.Rnd.float(-settings.angle * 0.5, settings.angle * 0.5) + emitter.rotation
+            : Rnd_1.Rnd.float(0, 6.28319) + emitter.rotation;
         if (settings.radius > 0) {
             var r = Rnd_1.Rnd.float(0, settings.radius) * this.__scaleMod;
             particle.component.transform.position.x = (this.__x + this._t * (this.x - this.__x)) + Math.cos(angle) * r;
@@ -2463,10 +2486,10 @@ var Easing = (function () {
     };
     Easing.easeInOutExpo = function (t, b, c, d) {
         if (t === 0) {
-            b;
+            return b;
         }
         if (t === d) {
-            b + c;
+            return b + c;
         }
         if ((t /= d / 2) < 1) {
             return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
@@ -2490,15 +2513,14 @@ var Easing = (function () {
         }
     };
     Easing.easeInElastic = function (t, b, c, d) {
-        var a, p, s;
-        s = 1.70158;
-        p = 0;
-        a = c;
+        var a = c;
+        var p = 0;
+        var s = 1.70158;
         if (t === 0) {
-            b;
+            return b;
         }
         else if ((t /= d) === 1) {
-            b + c;
+            return b + c;
         }
         if (!p) {
             p = d * .3;
@@ -2513,15 +2535,14 @@ var Easing = (function () {
         return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
     };
     Easing.easeOutElastic = function (t, b, c, d) {
-        var a, p, s;
-        s = 1.70158;
-        p = 0;
-        a = c;
+        var a = c;
+        var p = 0;
+        var s = 1.70158;
         if (t === 0) {
-            b;
+            return b;
         }
         else if ((t /= d) === 1) {
-            b + c;
+            return b + c;
         }
         if (!p) {
             p = d * .3;
@@ -2536,15 +2557,14 @@ var Easing = (function () {
         return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
     };
     Easing.easeInOutElastic = function (t, b, c, d) {
-        var a, p, s;
-        s = 1.70158;
-        p = 0;
-        a = c;
+        var a = c;
+        var p = 0;
+        var s = 1.70158;
         if (t === 0) {
-            b;
+            return b;
         }
         else if ((t /= d / 2) === 2) {
-            b + c;
+            return b + c;
         }
         if (!p) {
             p = d * (.3 * 1.5);
@@ -2650,7 +2670,7 @@ var FXSignal = (function () {
             var call = true;
             var data = node.data;
             if (data.callRate) {
-                if (data.calls % data.callRate != 0) {
+                if (data.calls % data.callRate !== 0) {
                     call = false;
                 }
             }
@@ -2750,8 +2770,9 @@ var LinkedList = (function () {
         return this;
     };
     LinkedList.prototype.clear = function () {
-        if (!this.first)
+        if (!this.first) {
             return;
+        }
         var node = this.first;
         while (node) {
             var next = node.next;
@@ -2762,8 +2783,9 @@ var LinkedList = (function () {
     };
     LinkedList.prototype.toArray = function () {
         var ret = [];
-        if (!this.first)
+        if (!this.first) {
             return ret;
+        }
         var node = this.first;
         while (node) {
             ret.push(node);

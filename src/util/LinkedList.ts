@@ -53,10 +53,10 @@ export class LinkedList {
     }
 
     public clear() {
-        if (!this.first) return;
+        if (!this.first) { return; }
         let node = this.first;
         while (node) {
-            let next = node.next;
+            const next = node.next;
             node.next = node.prev = node.list = null;
             node = next;
         }
@@ -65,7 +65,7 @@ export class LinkedList {
 
     public toArray(): Node[] {
         const ret = [];
-        if (!this.first) return ret;
+        if (!this.first) { return ret; }
         let node = this.first;
         while (node) {
             ret.push(node);

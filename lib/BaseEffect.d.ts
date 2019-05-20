@@ -1,9 +1,9 @@
-/// <reference types="pixi.js" />
-import { IEffectSequenceSettings, IEmitterSettings, FX } from "./FX";
+import { Container, Point } from "pixi.js";
+import { FX, IEffectSequenceSettings, IEmitterSettings } from "./FX";
 import { Node } from "./util/LinkedList";
 export declare class BaseEffect extends Node {
     componentId: string;
-    container: PIXI.Container;
+    container: Container;
     exhausted: boolean;
     completed: boolean;
     name: string;
@@ -12,7 +12,7 @@ export declare class BaseEffect extends Node {
     protected _y: number;
     protected _rotation: number;
     protected _alpha: number;
-    protected _scale: PIXI.Point;
+    protected _scale: Point;
     protected _time: number;
     protected _active: boolean;
     __fx: FX;
@@ -21,7 +21,7 @@ export declare class BaseEffect extends Node {
     update(dt: number): void;
     recycle(): void;
     readonly active: boolean;
-    scale: PIXI.Point;
+    scale: Point;
     alpha: number;
     rotation: number;
     y: number;

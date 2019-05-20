@@ -1,12 +1,13 @@
-/// <reference types="pixi.js" />
+// <reference types="pixi.js" />
 
-import {BaseEffect} from "./BaseEffect";
-import {IEmitterSettings, IMovieClipComponentParams, IParticleEmitterParent} from "./FX";
-import {LinkedList} from "./util/LinkedList";
-import {BaseEmitterCore} from "./core/BaseEmitterCore";
-import {Particle} from "./Particle";
-import {Rnd} from "./util/Rnd";
-import {FXSignal} from "./util/FXSignal";
+import { Container, DisplayObject } from "pixi.js";
+import { BaseEffect } from "./BaseEffect";
+import { BaseEmitterCore } from "./core/BaseEmitterCore";
+import { IEmitterSettings, IMovieClipComponentParams, IParticleEmitterParent } from "./FX";
+import { Particle } from "./Particle";
+import { FXSignal } from "./util/FXSignal";
+import { LinkedList } from "./util/LinkedList";
+import { Rnd } from "./util/Rnd";
 
 export interface IParticleEmitterSignals {
     started: FXSignal;
@@ -18,11 +19,10 @@ export interface IParticleEmitterSignals {
     particleUpdated: FXSignal;
 }
 
-
 export class ParticleEmitter extends BaseEffect implements IParticleEmitterParent {
 
     public infinite: boolean;
-    public target: PIXI.DisplayObject;
+    public target: DisplayObject;
     public targetOffset: number = 0;
 
     public core: BaseEmitterCore;
@@ -54,7 +54,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         particleUpdated: new FXSignal(),
         particleSpawned: new FXSignal(),
         particleBounced: new FXSignal(),
-        particleDied: new FXSignal()
+        particleDied: new FXSignal(),
     };
 
     constructor(componentId: string) {
@@ -64,15 +64,15 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
     // *********************************************************************************************
     // * Public																                                        					   *
     // *********************************************************************************************
-    public init(container: PIXI.Container, autoStart: boolean = true, scaleMod: number = 1): ParticleEmitter {
+    public init(container: Container, autoStart: boolean = true, scaleMod: number = 1): ParticleEmitter {
         this.container = container;
         this.core.__scaleMod = this._scaleMod = scaleMod;
-        if (autoStart) this.start();
+        if (autoStart) { this.start(); }
         return this;
     }
 
     public start(): ParticleEmitter {
-        if (this._active) return;
+        if (this._active) { return; }
 
         const t = Date.now();
         const s = this.settings;
@@ -83,11 +83,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         this.infinite = s.infinite;
         this._time = Number.MAX_VALUE;
 
-        if (s.duration > 0) {
-            this.endTime = t + s.duration * 1000;
-        } else {
-            this.endTime = s.duration;
-        }
+        this.endTime = s.duration > 0 ? t + s.duration * 1000 : s.duration;
 
         this._nextSpawnTime = 0;
         this._particleCount = 0;
@@ -147,9 +143,8 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
 
     public update(dt: number): ParticleEmitter {
 
-        if (!this._active) return;
+        if (!this._active) { return; }
         const t = Date.now();
-
 
         if (!this.exhausted) {
             if (this.settings.autoRotation !== 0) {
@@ -157,7 +152,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
             }
             if (this.target) {
                 this.rotation = this.target.rotation;
-                if (this.targetOffset == 0) {
+                if (this.targetOffset === 0) {
                     this.x = this.target.x;
                     this.y = this.target.y;
                 } else {
@@ -166,7 +161,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
                 }
             }
 
-            if (this.endTime == 0 && !this.infinite) {
+            if (this.endTime === 0 && !this.infinite) {
                 this.spawn();
                 this.exhausted = true;
             } else if (this.infinite || t < this.endTime) {
@@ -183,22 +178,22 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
                 }
             }
         } else {
-            if (this._particleCount == 0) {
+            if (this._particleCount === 0) {
                 this._active = false;
                 this.completed = true;
                 if (this.__on.completed.__hasCallback) {
                     this.__on.completed.dispatch(this);
                 }
                 this.__fx.__removeActiveEffect(this);
-                if (this.autoRecycleOnComplete) this.recycle();
+                if (this.autoRecycleOnComplete) { this.recycle(); }
             }
         }
 
         const list = this._particles;
-        let node = <Particle>list.first;
+        let node = list.first as Particle;
         let next;
         while (node) {
-            next = <Particle>node.next;
+            next = node.next as Particle;
             node.update(dt);
             node = next;
         }
@@ -206,7 +201,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
     }
 
     public spawn(): ParticleEmitter {
-        if (this._paused) return;
+        if (this._paused) { return; }
 
         const s = this.settings;
         const fx = this.__fx;
@@ -215,24 +210,24 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         this.core.prepare(n);
 
         while (--n > -1) {
-            if (this._particleCount >= s.maxParticles || fx.particleCount >= fx.maxParticles) return;
+            if (this._particleCount >= s.maxParticles || fx.particleCount >= fx.maxParticles) { return; }
 
             const ps = s.particleSettings;
-            const p = <Particle>fx.__getParticle();
+            const p = fx.__getParticle() as Particle;
             let component;
 
             switch (ps.componentType) {
                 case 0:
-                    p.componentId = <string>ps.componentId;
+                    p.componentId = ps.componentId as string;
                     component = fx.__getSprite(p.componentId);
                     break;
 
                 case 1:
-                    p.componentId = <string>ps.componentId;
+                    p.componentId = ps.componentId as string;
                     component = fx.__getMovieClip(p.componentId);
                     if (ps.componentParams) {
-                        component.loop = (<IMovieClipComponentParams> ps.componentParams).loop == null || !(<IMovieClipComponentParams> ps.componentParams).loop ? false : true;
-                        component.animationSpeed = Rnd.float((<IMovieClipComponentParams> ps.componentParams).animationSpeedMin || 1, (<IMovieClipComponentParams> ps.componentParams).animationSpeedMax || 1);
+                        component.loop = (ps.componentParams as IMovieClipComponentParams).loop;
+                        component.animationSpeed = Rnd.float((ps.componentParams as IMovieClipComponentParams).animationSpeedMin || 1, (ps.componentParams as IMovieClipComponentParams).animationSpeedMax || 1);
                     }
                     component.gotoAndPlay(0);
                     break;
@@ -248,7 +243,6 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
             this._particleCount++;
             fx.particleCount++;
 
-
         }
 
         this.core.step();
@@ -260,7 +254,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
 
     public recycle() {
 
-        if (this.__recycled) return;
+        if (this.__recycled) { return; }
 
         if (this.__parent) {
             this.__parent.__removeChildEmitter(this);
@@ -290,21 +284,21 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         this.name = null;
 
         const on = this.__on;
-        if (on.completed.__hasCallback) on.completed.removeAll();
-        if (on.started.__hasCallback) on.started.removeAll();
-        if (on.exhausted.__hasCallback) on.exhausted.removeAll();
-        if (on.particleBounced.__hasCallback) on.particleBounced.removeAll();
-        if (on.particleDied.__hasCallback) on.particleDied.removeAll();
-        if (on.particleSpawned.__hasCallback) on.particleSpawned.removeAll();
-        if (on.particleUpdated.__hasCallback) on.particleUpdated.removeAll();
+        if (on.completed.__hasCallback) { on.completed.removeAll(); }
+        if (on.started.__hasCallback) { on.started.removeAll(); }
+        if (on.exhausted.__hasCallback) { on.exhausted.removeAll(); }
+        if (on.particleBounced.__hasCallback) { on.particleBounced.removeAll(); }
+        if (on.particleDied.__hasCallback) { on.particleDied.removeAll(); }
+        if (on.particleSpawned.__hasCallback) { on.particleSpawned.removeAll(); }
+        if (on.particleUpdated.__hasCallback) { on.particleUpdated.removeAll(); }
     }
 
     public dispose() {
         const list = this._particles;
-        let node = <Particle>list.first;
+        let node = list.first as Particle;
         let next;
         while (node) {
-            next = <Particle>node.next;
+            next = node.next as Particle;
             node.recycle();
             node = next;
         }
@@ -386,7 +380,6 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         }
     }
 
-
     public set rotation(value: number) {
         this._rotation = this.core.rotation = value;
         if (this._hasChildEmitters) {
@@ -428,10 +421,10 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
     // * Private																				                                           *
     // *********************************************************************************************
     private recycleParticles() {
-        let node = <Particle>this._particles.first;
+        let node = this._particles.first as Particle;
         let next;
         while (node) {
-            next = <Particle>node.next;
+            next = node.next as Particle;
             node.recycle();
             node = next;
         }
@@ -465,7 +458,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         const index = this._childEmitters.indexOf(emitter);
         if (index > -1) {
             this._childEmitters.splice(index, 1);
-            if (this._childEmitters.length == 0) this._hasChildEmitters = false;
+            if (this._childEmitters.length === 0) { this._hasChildEmitters = false; }
         }
     }
 
