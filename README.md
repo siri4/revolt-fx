@@ -24,11 +24,11 @@ Fork the editor on Github
 Via NPM
 
 ```sh
-npm install revolt-fx
+npm install @siri4/revolt-fx
 ```
 
 ```js
-import {FX} from 'revolt-fx'
+import { FX } from "@siri4/revolt-fx/lib";
 const fx = new FX()
 ```
 
