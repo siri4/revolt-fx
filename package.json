@@ -1,6 +1,6 @@
 {
   "name": "revolt-fx",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Particle and Effect System for Pixi.js",
   "main": "./lib/index.js",
   "scripts": {},
