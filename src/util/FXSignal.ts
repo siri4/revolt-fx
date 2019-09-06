@@ -3,7 +3,7 @@ import { LinkedList, Node } from "./LinkedList";
 export class FXSignal {
 
     public __hasCallback: boolean = false;
-    private _list: LinkedList = new LinkedList();
+    private _list = new LinkedList<Node<FXSignalListener>>();
 
     constructor() {
     }
@@ -26,7 +26,7 @@ export class FXSignal {
         while (node) {
             next = node.next;
             let call = true;
-            const data = node.data as FXSignalListener;
+            const data = node.data;
             if (data.callRate) {
                 if (data.calls % data.callRate !== 0) {
                     call = false;

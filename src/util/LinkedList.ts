@@ -1,8 +1,8 @@
-export class LinkedList {
+export class LinkedList<N extends Node = Node> {
 
     public __length: number;
-    public first: Node;
-    public last: Node;
+    public first: N;
+    public last: N;
 
     constructor() {
         this.__length = 0;
@@ -15,7 +15,7 @@ export class LinkedList {
         return this.__length;
     }
 
-    public add(node: Node): LinkedList {
+    public add(node: N): LinkedList {
         if (this.first == null) {
             this.first = this.last = node;
         } else {
@@ -28,7 +28,7 @@ export class LinkedList {
         return this;
     }
 
-    public remove(node: Node): LinkedList {
+    public remove(node: N): LinkedList {
         if (node.list == null) {
             return;
         }
@@ -63,9 +63,11 @@ export class LinkedList {
         this.first = this.last = null;
     }
 
-    public toArray(): Node[] {
+    public toArray(): N[] {
         const ret = [];
-        if (!this.first) { return ret; }
+        if (!this.first) {
+            return ret;
+        }
         let node = this.first;
         while (node) {
             ret.push(node);
@@ -76,12 +78,12 @@ export class LinkedList {
 
 }
 
-export class Node {
-    public next: Node;
-    public prev: Node;
+export class Node<D = any> {
+    public next: this;
+    public prev: this;
     public list: LinkedList;
 
-    constructor(public data?: any) {
+    constructor(public data?: D) {
 
     }
 

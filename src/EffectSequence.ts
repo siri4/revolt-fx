@@ -32,7 +32,7 @@ export class EffectSequence extends BaseEffect {
     private _scaleMod: number;
     private _delay: number;
 
-    private _elements: LinkedList = new LinkedList();
+    private _elements = new LinkedList();
 
     public __on: IEffectSequenceSignals = {
         started: new FXSignal(),

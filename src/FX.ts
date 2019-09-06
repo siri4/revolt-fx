@@ -46,7 +46,7 @@ export class FX {
     private _settingsCache: any;
     private _nameMaps: any;
 
-    private _effects: LinkedList = new LinkedList();
+    private _effects = new LinkedList<BaseEffect>();
 
     public __containers: { [key: string]: Container } = {};
 
@@ -85,10 +85,10 @@ export class FX {
         if (delta !== undefined) { dt *= delta; }
 
         const list = this._effects;
-        let node = list.first as BaseEffect;
+        let node = list.first;
         let next;
         while (node) {
-            next = node.next as BaseEffect;
+            next = node.next;
             node.update(dt);
             node = next;
         }
@@ -125,10 +125,10 @@ export class FX {
 
     public dispose() {
         const list = this._effects;
-        let node = list.first as BaseEffect;
+        let node = list.first;
         while (node) {
             node.dispose();
-            node = node.next as BaseEffect;
+            node = node.next;
         }
         list.clear();
         this.clearCache();
@@ -360,7 +360,7 @@ export class FX {
     public stopAllEffects() {
         const list = this._effects.toArray();
         for (const node of list) {
-            (node as BaseEffect).recycle();
+            node.recycle();
         }
     }
 

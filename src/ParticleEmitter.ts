@@ -30,7 +30,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
     public settings: IEmitterSettings;
     public autoRecycleOnComplete: boolean = true;
 
-    private _particles: LinkedList = new LinkedList();
+    private _particles = new LinkedList<Particle>();
 
     private _particleCount: number = 0;
     private _spawnOnComplete: boolean;
@@ -190,10 +190,10 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
         }
 
         const list = this._particles;
-        let node = list.first as Particle;
+        let node = list.first;
         let next;
         while (node) {
-            next = node.next as Particle;
+            next = node.next;
             node.update(dt);
             node = next;
         }
@@ -213,7 +213,7 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
             if (this._particleCount >= s.maxParticles || fx.particleCount >= fx.maxParticles) { return; }
 
             const ps = s.particleSettings;
-            const p = fx.__getParticle() as Particle;
+            const p = fx.__getParticle();
             let component;
 
             switch (ps.componentType) {
@@ -295,10 +295,10 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
 
     public dispose() {
         const list = this._particles;
-        let node = list.first as Particle;
+        let node = list.first;
         let next;
         while (node) {
-            next = node.next as Particle;
+            next = node.next;
             node.recycle();
             node = next;
         }
@@ -421,10 +421,10 @@ export class ParticleEmitter extends BaseEffect implements IParticleEmitterParen
     // * Private																				                                           *
     // *********************************************************************************************
     private recycleParticles() {
-        let node = this._particles.first as Particle;
+        let node = this._particles.first;
         let next;
         while (node) {
-            next = node.next as Particle;
+            next = node.next;
             node.recycle();
             node = next;
         }
