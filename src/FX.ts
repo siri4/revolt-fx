@@ -392,7 +392,7 @@ export class FX {
         const cache = this._cache.sprites;
         let pool = cache[componentId];
 
-        if (cache[componentId] == null) {
+        if (!pool) {
             pool = cache[componentId] = [];
         }
 
@@ -410,7 +410,7 @@ export class FX {
         const cache = this._cache.mcs;
         let pool = cache[componentId];
 
-        if (cache[componentId] == null) {
+        if (!pool) {
             pool = cache[componentId] = [];
         }
 
@@ -440,7 +440,7 @@ export class FX {
         const cache = this._cache.cores;
         let pool = cache[type];
 
-        if (pool == null) {
+        if (!pool) {
             pool = cache[type] = [];
         }
 
@@ -484,25 +484,28 @@ export class FX {
     private parseObject(object: any, filter?: string): IParseSpriteSheetResult {
 
         const frames = object;
-        const mcs = {};
+        const mcs: {[key: string]: string[]} = {};
         const result: IParseSpriteSheetResult = { sprites: [], movieClips: [] };
-        for (const i of Object.keys(frames)) {
-            if (filter && i.indexOf(filter) === -1) {
+        for (const key of Object.keys(frames)) {
+            if (filter && key.indexOf(filter) === -1) {
                 continue;
             }
-            this.initSprite(i, { texture: i, anchorX: 0.5, anchorY: 0.5 });
-            result.sprites.push(i);
-            if (i.substr(0, 3) === "mc_") {
-                const parts = i.split("_");
+            this.initSprite(key, { texture: key, anchorX: 0.5, anchorY: 0.5 });
+            result.sprites.push(key);
+            if (key.substr(0, 3) === "mc_") {
+                const parts = key.split("_");
                 const group = parts[1];
-                if (mcs[group] == null) { mcs[group] = []; }
-                mcs[group].push(i);
+                if (mcs[group]) {
+                    mcs[group].push(key);
+                } else {
+                    mcs[group] = [key];
+                }
             }
         }
-        for (const i of Object.keys(mcs)) {
-            const textures = mcs[i];
-            result.movieClips.push(i);
-            this.initMovieClip(i, { textures, anchorX: 0.5, anchorY: 0.5 });
+        for (const group of Object.keys(mcs)) {
+            const textures = mcs[group].sort();
+            result.movieClips.push(group);
+            this.initMovieClip(group, { textures, anchorX: 0.5, anchorY: 0.5 });
         }
         return result;
     }
