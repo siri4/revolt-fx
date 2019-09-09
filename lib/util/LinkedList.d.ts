@@ -1,20 +1,20 @@
-export declare class LinkedList {
+export declare class LinkedList<N extends Node = Node> {
     __length: number;
-    first: Node;
-    last: Node;
+    first: N;
+    last: N;
     constructor();
     readonly length: number;
-    add(node: Node): LinkedList;
-    remove(node: Node): LinkedList;
+    add(node: N): LinkedList;
+    remove(node: N): LinkedList;
     clear(): void;
-    toArray(): Node[];
+    toArray(): N[];
 }
-export declare class Node {
-    data?: any;
-    next: Node;
-    prev: Node;
+export declare class Node<D = any> {
+    data?: D;
+    next: this;
+    prev: this;
     list: LinkedList;
-    constructor(data?: any);
+    constructor(data?: D);
     update(dt: number): void;
     dispose(): void;
 }

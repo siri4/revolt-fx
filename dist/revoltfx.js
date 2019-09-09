@@ -817,7 +817,7 @@ var FX = (function () {
     FX.prototype.__getSprite = function (componentId) {
         var cache = this._cache.sprites;
         var pool = cache[componentId];
-        if (cache[componentId] == null) {
+        if (!pool) {
             pool = cache[componentId] = [];
         }
         if (pool.length === 0) {
@@ -834,7 +834,7 @@ var FX = (function () {
     FX.prototype.__getMovieClip = function (componentId) {
         var cache = this._cache.mcs;
         var pool = cache[componentId];
-        if (cache[componentId] == null) {
+        if (!pool) {
             pool = cache[componentId] = [];
         }
         if (pool.length === 0) {
@@ -861,7 +861,7 @@ var FX = (function () {
     FX.prototype.__getEmitterCore = function (type, emitter) {
         var cache = this._cache.cores;
         var pool = cache[type];
-        if (pool == null) {
+        if (!pool) {
             pool = cache[type] = [];
         }
         if (pool.length === 0) {
@@ -895,26 +895,28 @@ var FX = (function () {
         var mcs = {};
         var result = { sprites: [], movieClips: [] };
         for (var _i = 0, _a = Object.keys(frames); _i < _a.length; _i++) {
-            var i = _a[_i];
-            if (filter && i.indexOf(filter) === -1) {
+            var key = _a[_i];
+            if (filter && key.indexOf(filter) === -1) {
                 continue;
             }
-            this.initSprite(i, { texture: i, anchorX: 0.5, anchorY: 0.5 });
-            result.sprites.push(i);
-            if (i.substr(0, 3) === "mc_") {
-                var parts = i.split("_");
+            this.initSprite(key, { texture: key, anchorX: 0.5, anchorY: 0.5 });
+            result.sprites.push(key);
+            if (key.substr(0, 3) === "mc_") {
+                var parts = key.split("_");
                 var group = parts[1];
-                if (mcs[group] == null) {
-                    mcs[group] = [];
+                if (mcs[group]) {
+                    mcs[group].push(key);
                 }
-                mcs[group].push(i);
+                else {
+                    mcs[group] = [key];
+                }
             }
         }
         for (var _b = 0, _c = Object.keys(mcs); _b < _c.length; _b++) {
-            var i = _c[_b];
-            var textures = mcs[i];
-            result.movieClips.push(i);
-            this.initMovieClip(i, { textures: textures, anchorX: 0.5, anchorY: 0.5 });
+            var group = _c[_b];
+            var textures = mcs[group].sort();
+            result.movieClips.push(group);
+            this.initMovieClip(group, { textures: textures, anchorX: 0.5, anchorY: 0.5 });
         }
         return result;
     };
