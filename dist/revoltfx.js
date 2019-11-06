@@ -410,10 +410,11 @@ exports.EffectSequence = EffectSequence;
 },{"./BaseEffect":1,"./FX":3,"./ParticleEmitter":6,"./util/FXSignal":16,"./util/LinkedList":17,"./util/Rnd":18}],3:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -568,7 +569,7 @@ var FX = (function () {
                 }
             }
             loader.load(function (l, d) {
-                resolve(_this.initBundle(d.rfx_bundleSettings.data));
+                resolve(_this.initBundle(d.rfx_bundleSettings.data, d.rfx_spritesheet.spritesheet));
             });
         });
     };
@@ -593,7 +594,7 @@ var FX = (function () {
                 }
             }
             loader.load(function (l, d) { return __awaiter(_this, void 0, void 0, function () {
-                var spritesheetImageData, spritesheetDef, settingsDef_1, list_2, _i, list_1, entry, base64, s, def, texture, spritesheet, err_1;
+                var spritesheetImageData, spritesheetDef, settingsDef_1, list_2, _i, list_1, entry, base64, s, def, texture, spritesheet_1, err_1;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -641,10 +642,10 @@ var FX = (function () {
                             return [3, 2];
                         case 7:
                             texture = pixi_js_1.Texture.from(spritesheetImageData);
-                            spritesheet = new pixi_js_1.Spritesheet(texture.baseTexture, spritesheetDef);
-                            spritesheet.parse(function () {
+                            spritesheet_1 = new pixi_js_1.Spritesheet(texture.baseTexture, spritesheetDef);
+                            spritesheet_1.parse(function () {
                                 setTimeout(function () {
-                                    resolve(_this.initBundle(settingsDef_1, true));
+                                    resolve(_this.initBundle(settingsDef_1, spritesheet_1, true));
                                 }, 100);
                             });
                             return [3, 9];
@@ -658,7 +659,7 @@ var FX = (function () {
             }); });
         });
     };
-    FX.prototype.initBundle = function (bundleSettings, clearCache) {
+    FX.prototype.initBundle = function (bundleSettings, spritesheet, clearCache) {
         if (bundleSettings.__h !== FX._bundleHash) {
             throw new Error("Invalid settings file.");
         }
@@ -679,7 +680,7 @@ var FX = (function () {
         }
         this.useBlendModes = bundleSettings.useBlendModes;
         this.maxParticles = bundleSettings.maxParticles;
-        return this.parseTextureCache(bundleSettings.spritesheetFilter);
+        return this.parseSpriteSheet(spritesheet, bundleSettings.spritesheetFilter);
     };
     FX.prototype.addParticleEmitter = function (componentId, settings) {
         if (this._settingsCache.emitters[componentId]) {

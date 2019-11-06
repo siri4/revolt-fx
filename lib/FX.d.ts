@@ -45,7 +45,7 @@ export declare class FX {
     dispose(): void;
     loadBundleFiles(bundleSettingsUrl: string, spritesheetUrl: string, spritesheetFilter?: string, additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult>;
     loadBundleZip(zipUrl: any, jszipInstance: any, additionalAssets?: string[] | IAdditionalAsset[]): Promise<IParseSpriteSheetResult>;
-    initBundle(bundleSettings: any, clearCache?: boolean): IParseSpriteSheetResult;
+    initBundle(bundleSettings: any, spritesheet: Spritesheet, clearCache?: boolean): IParseSpriteSheetResult;
     addParticleEmitter(componentId: string, settings: IEmitterSettings): FX;
     addEffectSequence(componentId: string, settings: IEffectSequenceSettings): FX;
     initSprite(componentId: string, settings: ISpriteSettings): FX;
