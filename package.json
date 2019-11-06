@@ -1,6 +1,6 @@
 {
   "name": "@siri4/revolt-fx",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Particle and Effect System for Pixi.js",
   "main": "./lib/index.js",
   "scripts": {},

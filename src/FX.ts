@@ -155,7 +155,7 @@ export class FX {
             }
 
             loader.load((l, d) => {
-                resolve(this.initBundle(d.rfx_bundleSettings.data));
+                resolve(this.initBundle(d.rfx_bundleSettings.data, d.rfx_spritesheet.spritesheet));
             });
         });
     }
@@ -219,7 +219,7 @@ export class FX {
                     const spritesheet = new Spritesheet(texture.baseTexture, spritesheetDef);
                     spritesheet.parse(() => {
                         setTimeout(() => {
-                            resolve(this.initBundle(settingsDef, true));
+                            resolve(this.initBundle(settingsDef, spritesheet, true));
                         }, 100);
                     });
                 } catch (err) {
@@ -229,7 +229,7 @@ export class FX {
         });
     }
 
-    public initBundle(bundleSettings: any, clearCache?: boolean): IParseSpriteSheetResult {
+    public initBundle(bundleSettings: any, spritesheet: Spritesheet, clearCache?: boolean): IParseSpriteSheetResult {
         if (bundleSettings.__h !== FX._bundleHash) {
             throw new Error("Invalid settings file.");
         }
@@ -253,7 +253,7 @@ export class FX {
         this.useBlendModes = bundleSettings.useBlendModes;
         this.maxParticles = bundleSettings.maxParticles;
 
-        return this.parseTextureCache(bundleSettings.spritesheetFilter);
+        return this.parseSpriteSheet(spritesheet, bundleSettings.spritesheetFilter)
     }
 
     public addParticleEmitter(componentId: string, settings: IEmitterSettings): FX {
@@ -368,6 +368,9 @@ export class FX {
         return this.parseObject(spriteSheet.data.frames, filter);
     }
 
+    /**
+     * @deprecated Use parseSpriteSheet instead.
+     */
     public parseTextureCache(filter?: string): IParseSpriteSheetResult {
         return this.parseObject(utils.TextureCache, filter);
     }
