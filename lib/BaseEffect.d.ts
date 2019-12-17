@@ -20,11 +20,16 @@ export declare class BaseEffect extends Node {
     constructor(componentId: string);
     update(dt: number): void;
     recycle(): void;
-    readonly active: boolean;
-    scale: Point;
-    alpha: number;
-    rotation: number;
-    y: number;
-    x: number;
+    get active(): boolean;
+    get scale(): Point;
+    set scale(value: Point);
+    get alpha(): number;
+    set alpha(value: number);
+    set rotation(value: number);
+    get rotation(): number;
+    get y(): number;
+    set y(value: number);
+    get x(): number;
+    set x(value: number);
     __applySettings(value: IEffectSequenceSettings | IEmitterSettings): void;
 }

@@ -3,7 +3,7 @@ export declare class LinkedList<N extends Node = Node> {
     first: N;
     last: N;
     constructor();
-    readonly length: number;
+    get length(): number;
     add(node: N): LinkedList;
     remove(node: N): LinkedList;
     clear(): void;

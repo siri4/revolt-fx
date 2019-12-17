@@ -65,7 +65,7 @@ export declare class FX {
     stopAllEffects(): void;
     parseSpriteSheet(spriteSheet: Spritesheet, filter?: string): IParseSpriteSheetResult;
     parseTextureCache(filter?: string): IParseSpriteSheetResult;
-    readonly active: boolean;
+    get active(): boolean;
     __addActiveEffect(effect: BaseEffect): void;
     __removeActiveEffect(effect: BaseEffect): void;
     __getSprite(componentId: string): Sprite;
